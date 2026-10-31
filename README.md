@@ -7,7 +7,7 @@
 
 ## What is this?
 
-This is a structured knowledge base compiled from roughly **160 sources** — personal notes, course slides, lecture PDFs, and hands-on practice — covering offensive security from first principles to advanced exploitation techniques.
+This is a structured knowledge base compiled from roughly **170 sources** — personal notes, course slides, lecture PDFs, and hands-on practice — covering offensive security from first principles to advanced exploitation techniques.
 
 The material is organized by **increasing complexity**: it starts with operating systems and networking fundamentals and progresses through web vulnerabilities, binary exploitation, malware analysis, OSINT, and AI-assisted attack research. Each section builds on the one before it.
 
@@ -38,10 +38,10 @@ The document is divided into 16 parts, organized from foundational to advanced:
 |---|---------|--------|
 | 1 | **Fundamentals** | CIA triad, threat modeling, Linux CLI, shell scripting, PowerShell, networking, cryptography |
 | 2 | **Pentest & Red Team Methodology** | Cyber Kill Chain, pentest phases, Black/Grey/White box, offensive mindset, Purple Team |
-| 3 | **Reconnaissance & Enumeration** | OSINT, Google Dorking, subdomain brute-force, port scanning, service enumeration, traffic capture |
+| 3 | **Reconnaissance & Enumeration** | OSINT, Google Dorking, subdomain brute-force, port scanning, service enumeration (incl. hands-on NFS, SMTP and MySQL exploitation), vulnerability categories & scoring (CVSS, VPR), traffic capture |
 | 4 | **Web Vulnerabilities** | OWASP Top 10 (2021) in depth — SQLi, XSS, IDOR, CSRF, SSRF, file upload bypass, race conditions, JWT attacks |
 | 5 | **Offensive Tools** | Burp Suite, SQLMap, Hydra, John / Hashcat, Metasploit / MSFVenom, CyberChef |
-| 6 | **Exploitation & Post-Exploitation** | Reverse/bind/web shells, Linux & Windows privilege escalation, pivoting, C2 frameworks, botnets |
+| 6 | **Exploitation & Post-Exploitation** | Reverse/bind/web shells (incl. Socat, named pipes, staged vs. stageless payloads, shell stabilization), Linux privilege escalation (kernel, sudo misconfig, SUID/SGID, capabilities, cron, PATH hijacking, NFS), Windows privilege escalation (credential hunting, AlwaysInstallElevated, scheduled tasks, service misconfigurations, dangerous privileges, unpatched software), Active Directory dMSA abuse (BadSuccessor), pivoting, C2 frameworks, botnets |
 | 7 | **Binary Exploitation (Advanced)** | x86 architecture, stack buffer overflows, SEH-based exploitation, egg hunters |
 | 8 | **API Security** | REST/GraphQL/gRPC, OWASP API Top 10, API pentest tooling |
 | 9 | **Blue Team / Defense** | SOC, SIEM, firewall, IDS/IPS, log analysis, incident response |
@@ -65,10 +65,12 @@ This is a **study document**, not an attack package.
 - Command-line references and tool flags
 - Code snippets for educational demonstration (detection, proof-of-concept)
 - Defensive context for each offensive technique
+- Real-world attack case studies, documented at the mechanism level (e.g. a CVE's root cause and exploitation logic), with the original researcher/source always linked
 
 **Deliberately omitted / catalogued by name only:**
 - Functional shellcode and complete binary exploits
 - Python scripts for buffer overflow exploitation (listed as methodological reference only, not as a usable package)
+- Full exploit scripts for specific CVEs (e.g. RPC-based local privilege escalation chains) — the vulnerability mechanism and protocol are documented, the ready-to-run code is not
 - CTF challenge writeups with full flag extraction
 
 ---
